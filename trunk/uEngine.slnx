@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="uCore/uCore.vcxproj" Id="94096a73-a541-4c1b-b4fd-9e22d73a2dab" />
+  <Project Path="uEngine/uEngine.vcxproj" Id="7c9bca6f-e0e6-4f83-9faa-7b946d0aef77" />
+</Solution>
