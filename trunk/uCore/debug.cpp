@@ -3,9 +3,9 @@
 
 void debug::fatal(const char* F, ...)
 {
-	string4096 buffer; // [rsp+20h] [rbp-2018h] BYREF
-	string4096 reason; // [rsp+1020h] [rbp-1018h] BYREF
-	va_list p; // [rsp+2048h] [rbp+10h] BYREF
+	string4096 buffer;
+    string4096 reason;
+	va_list p;
 
 	va_start(p, F);
 	vsnprintf(buffer, 0xFFFu, F, p);
@@ -25,6 +25,7 @@ void debug::backend(const char* reason, const char* file, const char* func, int 
 
     if (IsDebuggerPresent())
         __debugbreak();
+
     if ((_S4_0 & 1) == 0)
     {
         _S4_0 |= 1u;
@@ -103,22 +104,93 @@ void debug::backend(const char* reason, const char* file, const char* func, int 
 
 void debug::error(DWORD hr, const char* expr, const char* file, const char* func, int line)
 {
-    u_string<32>* v8; // rax
-    const char* buf; // r9
-    u_memory* v10; // rax
-    u_string<32> result; // [rsp+30h] [rbp-1058h] BYREF
-    string4096 reason; // [rsp+60h] [rbp-1028h] BYREF
+    string4096 reason;
 
-    v8 = debug::error2string(&result, hr);
-    if (v8->capacity <= 0x20u)
-        buf = (const char*)v8->buf;
-    else
-        buf = v8->ptr;
-    sz_printf(reason, 0x1000u, "*** API-failure ***\n%s\nExpression: %s", buf, expr);
-    if (result.ptr)
+    u_string result;
+    u_string v8 = debug::error2string(&result, hr);
+    LPCSTR buf = v8.c_str();
+    sprintf_s(reason, sizeof(reason), "*** API-failure ***\n%s\nExpression: %s", buf, expr);
+    if (result.size())
     {
-        v10 = memory();
-        u_memory::main_realloc(v10, result.ptr, 0, 0, "u_string", 0);
+        u_memory::main_realloc(memory(), result.size(), 0, 0, "u_string", 0);
     }
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(const char* e1, const char* file, const char* func, int line)
+{
+    string4096 reason;
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n", e1);
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(const char* e1, const char* e2, const char* file, const char* func, int line)
+{
+    string4096 reason;
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s", e1, e2);
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(
+    const char* e1,
+    const char* e2,
+    const char* e3,
+    const char* file,
+    const char* func,
+    int line)
+{
+    string4096 reason;
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s", e1, e2, e3);
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(
+    const char* e1,
+    const char* e2,
+    const char* e3,
+    const char* e4,
+    const char* file,
+    const char* func,
+    int line)
+{
+    string4096 reason;
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s", e1, e2, e3, e4);
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(
+    const char* e1,
+    const char* e2,
+    const char* e3,
+    const char* e4,
+    const char* e5,
+    const char* file,
+    const char* func,
+    int line)
+{
+    string4096 reason;
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s\n%s", e1, e2, e3, e4, e5);
+    debug::backend(reason, file, func, line);
+}
+
+void debug::fail(
+    const char* e1,
+    const char* e2,
+    const char* e3,
+    const char* e4,
+    const char* e5,
+    const char* e6,
+    const char* file,
+    const char* func,
+    int line)
+{
+    string4096 reason; // [rsp+50h] [rbp-1028h] BYREF
+
+    sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s\n%s\n%s", e1, e2, e3, e4, e5, e6);
     debug::backend(reason, file, func, line);
 }

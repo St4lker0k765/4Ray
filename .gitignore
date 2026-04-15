@@ -13,3 +13,5 @@ ipch/
 *.VC.db
 *.VC.VC.opendb
 *.aps
+
+build/
