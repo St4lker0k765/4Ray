@@ -4,11 +4,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <malloc.h>
+#include "fastdelegate.h"
 #include "_types.h"
-#include "u_string.h"
-#include <string>
-#include "debug.h"
-#include <vector>
+#include "threading.h"
 
 #ifdef UCORE_EXPORTS
 #define UCORE_API __declspec(dllexport)
@@ -16,6 +14,11 @@
 #define UCORE_API __declspec(dllimport)
 #endif
 
+#include "debug.h"
 #include "_std_extensions.h"
+#include "_stl_extensions.h"
+#include "u_string.h"
+#include "log.h"
 
-typedef	std::string u_string;
+UCORE_API str_shared g_levelname;
+

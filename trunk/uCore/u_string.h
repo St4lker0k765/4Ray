@@ -1,5 +1,3 @@
-#ifndef xrstringH
-#define xrstringH
 #pragma once
 
 #pragma pack(push,4)
@@ -10,13 +8,16 @@ typedef const char*		str_c;
 #pragma warning(disable : 4200)
 struct		UCORE_API	str_value
 {
-	u32					dwReference		;
-	u32					dwLength		;
-	u32					dwCRC			;
+	str_value*			next			;
+	u32					refs			;
+	u16					length			;
+	u16					str_type		;
+	u32					crc				;
 	char				value		[]	;
 };
-struct		UCORE_API	str_value_cmp	{ // less
-	IC bool		operator ()	(const str_value* A, const str_value* B) const	{ return A->dwCRC<B->dwCRC;	};
+struct		UCORE_API	str_value_cmp	
+{ // less
+	inline bool		operator ()	(const str_value* A, const str_value* B) const	{ return A->crc<B->crc;	};
 };
 #pragma warning(default : 4200)
 
@@ -24,10 +25,13 @@ struct		UCORE_API	str_value_cmp	{ // less
 class		UCORE_API	str_container
 {
 private:
-	typedef xr_multiset<str_value*,str_value_cmp>	cdb;
-	xrCriticalSection								cs;
-	cdb												container;
+	u_vector<str_value*> buckets;
+	str_value*			gc_iterator;
+	u32					gc_bucket;
+	u32					amount;
+	str_value*			zero_len_str;
 public:
+	str_value*			do_dock			(str_c value, u32 s_len, u16 s_type);
 	str_value*			dock			(str_c value);
 	void				clean			();
 	void				dump			();
@@ -35,7 +39,7 @@ public:
 	u32					stat_economy	();
 						~str_container	();
 };
-UCORE_API	extern		str_container*	g_pStringContainer;
+UCORE_API	extern		str_container*	g_string_container;
 
 //////////////////////////////////////////////////////////////////////////
 class					str_shared
@@ -44,10 +48,10 @@ private:
 	str_value*			p_;
 protected:
 	// ref-counting
-	void				_dec		()								{	if (0==p_) return;	p_->dwReference--; 	if (0==p_->dwReference)	p_=0;						}
+	void				_dec		()								{	if (0==p_) return;	p_->refs--; 	if (0==p_->refs)	p_=0;						}
 public:
-	void				_set		(str_c rhs) 					{	str_value* v = g_pStringContainer->dock(rhs); if (0!=v) v->dwReference++; _dec(); p_ = v;	}
-	void				_set		(str_shared const &rhs)			{	str_value* v = rhs.p_; if (0!=v) v->dwReference++; _dec(); p_ = v;							}
+	void				_set		(str_c rhs) 					{	str_value* v = g_string_container->dock(rhs); if (0!=v) v->refs++; _dec(); p_ = v;	}
+	void				_set		(str_shared const &rhs)			{	str_value* v = rhs.p_; if (0!=v) v->refs++; _dec(); p_ = v;							}
 	const str_value*	_get		()	const						{	return p_;																					}
 public:
 	// construction
@@ -65,7 +69,7 @@ public:
 	str_c				c_str		() const						{	return p_?p_->value:0;							}
 
 	// misc func
-	u32					size		()						const	{	if (0==p_) return 0; else return p_->dwLength;	}
+	u32					size		()						const	{	if (0==p_) return 0; else return p_->length;	}
 	void				swap		(str_shared& rhs)				{	str_value* tmp = p_; p_ = rhs.p_; rhs.p_ = tmp;	}
 	bool				equal		(const str_shared& rhs) const	{	return (p_ == rhs.p_);							}
 	str_shared& __cdecl	sprintf		(const char* format, ...)		
@@ -93,18 +97,13 @@ inline bool operator	!=	(str_shared const & a, str_shared const & b)		{ return a
 inline bool operator	<	(str_shared const & a, str_shared const & b)		{ return a._get() <  b._get();					}
 inline bool operator	>	(str_shared const & a, str_shared const & b)		{ return a._get() >  b._get();					}
 
-// externally visible standart functionality
-IC void swap			(shared_str & lhs, shared_str & rhs)				{ lhs.swap(rhs);		}
-IC u32	xr_strlen		(shared_str & a)									{ return a.size();		}
-IC int	xr_strcmp		(const shared_str & a, const char* b)				{ return xr_strcmp(*a,b);	}
-IC int	xr_strcmp		(const char* a, const shared_str & b)				{ return xr_strcmp(a,*b);	}
-IC int	xr_strcmp		(const shared_str & a, const shared_str & b)		{ 
-	if (a.equal(b))		return 0;
-	else				return xr_strcmp(*a,*b);
-}
-IC void	xr_strlwr		(xr_string& src)									{ for(xr_string::iterator it=src.begin(); it!=src.end(); it++) *it=xr_string::value_type(tolower(*it));}
-IC void	xr_strlwr		(shared_str& src)									{ if (*src){LPSTR lp=xr_strdup(*src); xr_strlwr(lp); src=lp; xr_free(lp);} }
+// string(char)
+class u_string : public	std::basic_string<char, std::char_traits<char>, ualloc<char> >
+{
+private:
+	typedef std::basic_string<char, std::char_traits<char>, ualloc<char> > inherited;
+public:
+	u_string vset(const char* format, va_list arg_list);
+};
 
 #pragma pack(pop)
-
-#endif

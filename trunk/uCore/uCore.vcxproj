@@ -118,7 +118,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UCORE_API;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -177,6 +177,7 @@
     <ClInclude Include="archive_text_inline.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="ext_stl.h" />
+    <ClInclude Include="fastdelegate.h" />
     <ClInclude Include="libbitwise.h" />
     <ClInclude Include="libmmgr.h" />
     <ClInclude Include="libmmgr_shared.h" />
@@ -205,6 +206,7 @@
     <ClInclude Include="vfs_trace.h" />
     <ClInclude Include="vfs_utils.h" />
     <ClInclude Include="_std_extensions.h" />
+    <ClInclude Include="_stl_extensions.h" />
     <ClInclude Include="_types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -29,7 +29,7 @@ protected:
 	u_sarray<int, KEYS_COUNT> _key_binding;
 	u_sarray<bool, KEYS_COUNT> _key_state;
 
-	std::vector<cinput_manager_core::receiver_p> _receivers;
+	u_vector<cinput_manager_core::receiver_p> _receivers;
 	u64 _active_gamepad;
 	bool _allow_option_vibration;
 	bool _gamepad_connected;

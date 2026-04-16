@@ -1,5 +1,35 @@
 #include "stdafx.h"
 #include "debug.h"
+#include "../3rd-party/BugTrap/BugTrap.h"
+
+void bugtrap_show()
+{
+    HANDLE BTHandle = OpenThread(THREAD_ALL_ACCESS, 0, GetCurrentThreadId());
+    if (BTHandle)
+    {
+        _CONTEXT Context;
+        Context.ContextFlags = CONTEXT_FULL;
+        if (GetThreadContext(BTHandle, &Context))
+        {
+            _EXCEPTION_POINTERS ep;
+            ep.ExceptionRecord = nullptr;
+            ep.ContextRecord = &Context;
+            BT_SehFilter(&ep);
+            CloseHandle(BTHandle);
+        }
+    }
+}
+
+void bugtrap_message(const char* msg)
+{
+    BT_SetDialogMessage(BTDM_INTRO2, (LPCTSTR)msg);
+}
+
+void* log_flush(str_shared* result)
+{
+    Log->flush_to_hdd();
+    result = Log->fname;
+}
 
 void debug::fatal(const char* F, ...)
 {
@@ -8,48 +38,46 @@ void debug::fatal(const char* F, ...)
 	va_list p;
 
 	va_start(p, F);
-	vsnprintf(buffer, 0xFFFu, F, p);
+	vsnprintf(buffer, sizeof(buffer), F, p);
 	va_end(p);	
 	sprintf_s(reason, sizeof(reason), "*** Fatal Error ***\n%s", buffer);
-	debug::backend(reason, 0, 0, 0);
+	backend(reason, 0, 0, 0);
+}
+
+LPCSTR debug::error2string(DWORD code)
+{
+	LPCSTR				result	= 0;
+	static	string1024	desc_storage;
+
+#ifdef _M_AMD64
+#else
+	result				= DXGetErrorDescription9	(code);
+#endif
+	if (!result) 
+	{
+		FormatMessageA	(FORMAT_MESSAGE_FROM_SYSTEM,0,code,0,desc_storage,sizeof(desc_storage)-1,0);
+		result			= desc_storage;
+	}
+	return		result	;
 }
 
 void debug::backend(const char* reason, const char* file, const char* func, int line)
 {
-    int length; // ecx
-    char* value; // r9
-    int v10; // ecx
-    char* v11; // r9
-    str_shared result; // [rsp+40h] [rbp-1048h] BYREF
-    string4096 temp; // [rsp+50h] [rbp-1038h] BYREF
-
-    if (IsDebuggerPresent())
-        __debugbreak();
-
-    if ((_S4_0 & 1) == 0)
-    {
-        _S4_0 |= 1u;
-        threading::mutex::mutex(&m, "debug::backend");
-        atexit(debug::backend_::_4_::_dynamic_atexit_destructor_for__m__);
-    }
-    threading::mutex::lock(&m);
+    MTX.lock();
     rlog("! [STOP] file '%s', function '%s', line %d.\n***Reason***: %s", file, func, line, reason);
+ 
+    string4096 temp;
     if (file && func && line)
     {
-        if (g_levelname.p_)
-            length = g_levelname.p_->length;
-        else
-            length = 0;
+        int length = 0;
+        if (g_levelname._get())
+            length = g_levelname._get()->length;
+
+        LPCSTR value = "";
         if (length)
         {
-            if (g_levelname.p_)
-                value = g_levelname.p_->value;
-            else
-                value = 0;
-        }
-        else
-        {
-            value = (char*)def;
+            if (g_levelname._get())
+                value = g_levelname.c_str();
         }
         sprintf_s(
             temp,
@@ -63,43 +91,37 @@ void debug::backend(const char* reason, const char* file, const char* func, int 
     }
     else
     {
-        if (g_levelname.p_)
-            v10 = g_levelname.p_->length;
-        else
-            v10 = 0;
-        if (v10)
+        int length = 0;
+        if (g_levelname._get())
+            length = g_levelname._get()->length;
+
+        LPCSTR value = "";
+        if (length)
         {
-            if (g_levelname.p_)
-                v11 = g_levelname.p_->value;
-            else
-                v11 = 0;
+            if (g_levelname._get())
+                value = g_levelname.c_str();
         }
-        else
-        {
-            v11 = (char*)def;
-        }
-        sz_printf(temp, 0x1000u, "! [STOP] level '%s'.\n***Reason***: %s", v11, reason);
+        sprintf_s(temp, sizeof(temp), "! [STOP] level '%s'.\n***Reason***: %s", value, reason);
     }
     bugtrap_message(temp);
+    str_shared result;
     log_flush(&result);
-    if (result.p_)
-    {
-        _InterlockedDecrement(&result.p_->refs);
-        result.p_ = 0;
-    }
-    if (on_debug_break_cb_0.m_Closure.m_pthis || on_debug_break_cb_0.m_Closure.m_pFunction)
-        on_debug_break_cb_0.m_Closure.m_pFunction(on_debug_break_cb_0.m_Closure.m_pthis);
+
+    if (on_debug_break_cb_0)
+        on_debug_break_cb_0();
+
     if (IsDebuggerPresent())
     {
         MessageBoxA(NULL, temp, "error", MB_ICONEXCLAMATION);
         __debugbreak();
     }
-    if (!IsDebuggerPresent())
+    else
     {
         bugtrap_show();
-        *crash = 0;
+#pragma todo("Determine what this does. Modified externally?") 
+//     *crash = 0;
     }
-    threading::mutex::unlock(&m);
+    MTX.unlock();
 }
 
 void debug::error(DWORD hr, const char* expr, const char* file, const char* func, int line)
@@ -107,14 +129,9 @@ void debug::error(DWORD hr, const char* expr, const char* file, const char* func
     string4096 reason;
 
     u_string result;
-    u_string v8 = debug::error2string(&result, hr);
-    LPCSTR buf = v8.c_str();
+    LPCSTR buf = error2string(hr);
     sprintf_s(reason, sizeof(reason), "*** API-failure ***\n%s\nExpression: %s", buf, expr);
-    if (result.size())
-    {
-        u_memory::main_realloc(memory(), result.size(), 0, 0, "u_string", 0);
-    }
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(const char* e1, const char* file, const char* func, int line)
@@ -122,7 +139,7 @@ void debug::fail(const char* e1, const char* file, const char* func, int line)
     string4096 reason;
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n", e1);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(const char* e1, const char* e2, const char* file, const char* func, int line)
@@ -130,7 +147,7 @@ void debug::fail(const char* e1, const char* e2, const char* file, const char* f
     string4096 reason;
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s", e1, e2);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(
@@ -144,7 +161,7 @@ void debug::fail(
     string4096 reason;
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s", e1, e2, e3);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(
@@ -159,7 +176,7 @@ void debug::fail(
     string4096 reason;
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s", e1, e2, e3, e4);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(
@@ -175,7 +192,7 @@ void debug::fail(
     string4096 reason;
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s\n%s", e1, e2, e3, e4, e5);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
 
 void debug::fail(
@@ -192,5 +209,7 @@ void debug::fail(
     string4096 reason; // [rsp+50h] [rbp-1028h] BYREF
 
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s\n%s\n%s", e1, e2, e3, e4, e5, e6);
-    debug::backend(reason, file, func, line);
+    backend(reason, file, func, line);
 }
+
+UCORE_API debug Debug;
