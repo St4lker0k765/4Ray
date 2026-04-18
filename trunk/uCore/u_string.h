@@ -25,6 +25,7 @@ struct		UCORE_API	str_value_cmp
 class		UCORE_API	str_container
 {
 private:
+	threading::mutex*	MTX;
 	u_vector<str_value*> buckets;
 	str_value*			gc_iterator;
 	u32					gc_bucket;
@@ -36,7 +37,6 @@ public:
 	void				clean			();
 	void				dump			();
 	void				verify			();
-	u32					stat_economy	();
 						~str_container	();
 };
 UCORE_API	extern		str_container*	g_string_container;
@@ -97,13 +97,15 @@ inline bool operator	!=	(str_shared const & a, str_shared const & b)		{ return a
 inline bool operator	<	(str_shared const & a, str_shared const & b)		{ return a._get() <  b._get();					}
 inline bool operator	>	(str_shared const & a, str_shared const & b)		{ return a._get() >  b._get();					}
 
+#include <string>
 // string(char)
-class u_string : public	std::basic_string<char, std::char_traits<char>, ualloc<char> >
+class u_string : public	std::basic_string<char, std::char_traits<char>, u_alloc<char> >
 {
 private:
-	typedef std::basic_string<char, std::char_traits<char>, ualloc<char> > inherited;
+	typedef std::basic_string<char, std::char_traits<char>, u_alloc<char> > inherited;
 public:
 	u_string vset(const char* format, va_list arg_list);
+	u_string sz_replace_file_ext(const char* src, const char* ext)
 };
 
 #pragma pack(pop)

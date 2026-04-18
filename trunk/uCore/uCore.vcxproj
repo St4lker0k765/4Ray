@@ -70,6 +70,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\build\intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\build\intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -110,6 +118,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,6 +135,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(SolutionDir)..\build\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -148,8 +158,10 @@
     <ClCompile Include="log.cpp" />
     <ClCompile Include="progress_manager.cpp" />
     <ClCompile Include="threading.cpp" />
+    <ClCompile Include="timing.cpp" />
     <ClCompile Include="uCore.cpp" />
     <ClCompile Include="u_compressor.cpp" />
+    <ClCompile Include="u_platform.cpp" />
     <ClCompile Include="u_string.cpp" />
     <ClCompile Include="vfs.cpp" />
     <ClCompile Include="vfs_buffered_io.cpp" />
@@ -191,22 +203,25 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threading.h" />
     <ClInclude Include="threading_rw_check.h" />
+    <ClInclude Include="timing.h" />
     <ClInclude Include="uCore.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="u_map.h" />
+    <ClInclude Include="u_platform.h" />
+    <ClInclude Include="u_random.h" />
     <ClInclude Include="u_string.h" />
     <ClInclude Include="u_svector.h" />
     <ClInclude Include="u_taskpool.h" />
     <ClInclude Include="u_vector.h" />
     <ClInclude Include="u_vector_base.h" />
+    <ClInclude Include="vfs.h" />
     <ClInclude Include="vfs_buffered_io.h" />
     <ClInclude Include="vfs_path_notifier.h" />
     <ClInclude Include="vfs_streams.h" />
     <ClInclude Include="vfs_streams_internal.h" />
     <ClInclude Include="vfs_trace.h" />
     <ClInclude Include="vfs_utils.h" />
-    <ClInclude Include="_std_extensions.h" />
-    <ClInclude Include="_stl_extensions.h" />
+    <ClInclude Include="ext_std.h" />
     <ClInclude Include="_types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

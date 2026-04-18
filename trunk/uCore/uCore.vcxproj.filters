@@ -123,6 +123,12 @@
     <ClCompile Include="u_string.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="timing.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="u_platform.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="archive.h">
@@ -239,13 +245,22 @@
     <ClInclude Include="log.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="_std_extensions.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="_stl_extensions.h">
+    <ClInclude Include="ext_std.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="fastdelegate.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="vfs.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="timing.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="u_platform.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="u_random.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

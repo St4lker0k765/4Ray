@@ -64,6 +64,16 @@ typedef	char	string1024	[1024];
 typedef	char	string2048	[2048];
 typedef	char	string4096	[4096];
 
+typedef	wchar_t	wstring16	[16];
+typedef	wchar_t	wstring32	[32];
+typedef	wchar_t	wstring64	[64];
+typedef	wchar_t	wstring128	[128];
+typedef	wchar_t	wstring256	[256];
+typedef	wchar_t	wstring512	[512];
+typedef	wchar_t	wstring1024	[1024];
+typedef	wchar_t	wstring2048	[2048];
+typedef	wchar_t	wstring4096	[4096];
+
 typedef	char	string_path	[2*_MAX_PATH];
 
 #endif

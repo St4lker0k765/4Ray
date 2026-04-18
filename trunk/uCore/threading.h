@@ -14,5 +14,20 @@ namespace threading
 			void lock();
 			bool trylock();
 			void unlock();
-	}
-}
+	};
+	class spin_lock
+	{
+	protected:
+		volatile int _lock = 0;
+	public:
+		~spin_lock() {}
+		bool check_lock(u32 value);
+		void lock();
+		bool locked();
+		// Names for debug?
+		spin_lock(const char* __formal) {}
+		bool trylock();
+		void unlock();
+	};
+	void yield(u32 ms);
+};

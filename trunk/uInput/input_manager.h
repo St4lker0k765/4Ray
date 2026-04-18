@@ -26,8 +26,8 @@ protected:
 	u_token* _action_names;
 	timing::timer _timer;
 	u32 _muted;
-	u_sarray<int, KEYS_COUNT> _key_binding;
-	u_sarray<bool, KEYS_COUNT> _key_state;
+	svector<int, KEYS_COUNT> _key_binding;
+	svector<bool, KEYS_COUNT> _key_state;
 
 	u_vector<cinput_manager_core::receiver_p> _receivers;
 	u64 _active_gamepad;

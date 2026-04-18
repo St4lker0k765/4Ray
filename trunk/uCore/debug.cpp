@@ -1,35 +1,9 @@
 #include "stdafx.h"
 #include "debug.h"
-#include "../3rd-party/BugTrap/BugTrap.h"
 
-void bugtrap_show()
-{
-    HANDLE BTHandle = OpenThread(THREAD_ALL_ACCESS, 0, GetCurrentThreadId());
-    if (BTHandle)
-    {
-        _CONTEXT Context;
-        Context.ContextFlags = CONTEXT_FULL;
-        if (GetThreadContext(BTHandle, &Context))
-        {
-            _EXCEPTION_POINTERS ep;
-            ep.ExceptionRecord = nullptr;
-            ep.ContextRecord = &Context;
-            BT_SehFilter(&ep);
-            CloseHandle(BTHandle);
-        }
-    }
-}
-
-void bugtrap_message(const char* msg)
-{
-    BT_SetDialogMessage(BTDM_INTRO2, (LPCTSTR)msg);
-}
-
-void* log_flush(str_shared* result)
-{
-    Log->flush_to_hdd();
-    result = Log->fname;
-}
+void bugtrap_show();
+void bugtrap_message(const char* msg);
+void log_flush(str_shared* result);
 
 void debug::fatal(const char* F, ...)
 {

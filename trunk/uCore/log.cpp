@@ -50,100 +50,51 @@ void rlog(const char* format, ...)
 }
 
 
-static int day_in_month[12] = 
+static int days_in_month[12] = 
 {
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
-static LPCSTR month[12] = 
+static LPCSTR month_id[12] = 
 {
     "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
 };
 
+static int start_day = 30;	    // 30
+static int start_month = 6;	    // June
 static int start_year = 2005;	// 2005
 
-u64 build_number()
+u32 build_number()
 {
-    int v0; // esi
-    int v1; // ebp
-    int v2; // ebx
-    int v3; // edi
-    const char** v4; // r14
-    u64 v6; // rcx
-    unsigned int v7; // eax
-    __m128i v8; // xmm2
-    __m128i v9; // xmm1
-    int v10; // edx
-    __int64 v11; // rax
-    __m128i v12; // xmm0
-    __m128i v13; // xmm1
-    __m128i v14; // xmm1
-    int v15; // edx
-    int ynum; // [rsp+30h] [rbp-B8h] BYREF
-    int dnum; // [rsp+34h] [rbp-B4h] BYREF
+	int days;
+	int months = 0;
+	int years;
 
-    v0 = 0;
-    v1 = 0;
-    v2 = 0;
-    string128 buf; //
-    R_ASSERT(!strcpy_s(buf, sizeof(buf), __DATE__));
+	string16 month;
 
-    string16 mon;
-    sscanf(buf, "%s %d %d", mon, &dnum, &ynum);
-    v3 = 0;
-    v4 = month;
-    for (int i = 0; i < 12; i++)
-    {
-        if (_stricmp(month[i], mon))
-            continue;
-        months = i;
-        break;
-    }
-    LODWORD(v6) = 6;
-    v7 = v2 - 6;
-    if (v2 > 6 && v7 >= 8)
-    {
-        v8 = 0;
-        v9 = 0;
-        v10 = v2 - (int)v7 % 8;
-        do
-        {
-            v11 = (int)v6;
-            LODWORD(v6) = v6 + 8;
-            v8 = _mm_add_epi32(_mm_loadu_si128((const __m128i*) & day_in_month[v11]), v8);
-            v12 = _mm_add_epi32(_mm_loadu_si128((const __m128i*) & day_in_month[v11 + 4]), v9);
-            v9 = v12;
-        } while ((int)v6 < v10);
-        v13 = _mm_add_epi32(v12, v8);
-        v14 = _mm_add_epi32(v13, _mm_srli_si128(v13, 8));
-        v1 = _mm_cvtsi128_si32(_mm_add_epi32(v14, _mm_srli_si128(v14, 4)));
-    }
-    v6 = (int)v6;
-    v15 = 0;
-    if ((int)v6 < (__int64)v2)
-    {
-        if (v2 - (__int64)(int)v6 >= 2)
-        {
-            do
-            {
-                v0 += day_in_month[v6];
-                v15 += day_in_month[v6 + 1];
-                v6 += 2;
-            } while (v6 < v2 - 1LL);
-        }
-        if (v6 < v2)
-            v1 += day_in_month[v6];
-        v1 += v15 + v0;
-    }
-    return v1 + dnum + 365 * (ynum - start_year);
+	string256 buffer;
+	strcpy_s(buffer, sizeof(buffer), __DATE__);
 
-    int build_id = days + 365 * (ynum - start_year);
+	sscanf(buffer, "%s %d %d", month, &days, &years);
 
-    for (int i = 0; i < months; ++i)
-        build_id += day_in_month[i];
+	for (int i = 0; i < 12; i++)
+	{
+		if (_stricmp(month_id[i], month))
+			continue;
 
-    for (int i = 0; i < start_month - 1; ++i)
-        build_id -= day_in_month[i];
+		months = i;
+		break;
+	}
+
+	int build_id = (years - start_year) * 365 + days - start_day;
+
+	for (int i = 0; i < months; ++i)
+		build_id += days_in_month[i];
+
+	for (int i = 0; i < start_month - 1; ++i)
+		build_id -= days_in_month[i];
+
+    return build_id;
 }
 
 logger::logger()
@@ -154,7 +105,7 @@ logger::logger()
 
     MTX = new threading::mutex("log");
 #pragma todo("Implement params for uCore")
-    this->flush_forced = false; //strstr(core.params, "-forcelog ");
+    flush_forced = false; //strstr(core.params, "-forcelog ");
 }
 
 logger::~logger()
