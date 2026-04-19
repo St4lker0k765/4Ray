@@ -142,7 +142,7 @@ logger::logger()
     strings.clear();
     callbacks.clear();
 
-    MTX = new threading::mutex("log");
+    threading::mutex("log");
     flush_forced = strstr(core.params(), "-forcelog ");
 }
 
@@ -150,7 +150,6 @@ logger::~logger()
 {
     callbacks.clear();
     strings.clear();
-    delete MTX;
 }
 
 void logger::add(const char* split)
@@ -158,9 +157,9 @@ void logger::add(const char* split)
     OutputDebugStringA(split);
     OutputDebugStringA("\n");
 
-    MTX->lock();
+    lock();
     strings.push_back(split);
-    MTX->unlock();
+    unlock();
 
     for (int i = 0; i < callbacks.size(); i++)
     {
@@ -173,18 +172,8 @@ void logger::add(const char* split)
 
 void logger::flush_to_hdd()
 {
-    unsigned int v7; // r15d
-    unsigned int v8; // r12d
-    threading_rw_check* v9; // rbx
-    _QWORD* v10; // rsi
-    __int64 v11; // rax
-    const char* v12; // rdx
-    vfs::iwriter* object; // rbx
-    int v14; // eax
-    vfs::iwriter* v15; // rcx
     gtl::intrusive_ptr<vfs::iwriter, gtl::intrusive_base, gtl::intrusive_default_functionality, gtl::thread_safe_inc_dec<gtl::intrusive_base> > f; // [rsp+60h] [rbp+8h] BYREF
 
-    str_value* p = this->fname.p_;
     if (fname.size())
     {
         if (!flush_forced)
@@ -192,99 +181,16 @@ void logger::flush_to_hdd()
             rlog("log flushed to [%s]", fname.c_str());
             rlog("%s build %d[SVN=%s], %s, %s\n", "uCore :: 4A platform", build_number(), core.game_version.c_str(), __DATE__, __TIME__);
         }
-        MTX->lock();
+        lock();
         vfs::wopen_os(&f, fname.c_str());
         if (f._object)
         {
-            v7 = 0;
-            if (strings.size())
+            for (int i = 0; i < strings.size(); i++)
             {
-                v8 = 0;
-                do
-                {
-                    if (this == (logger*)-56LL)
-                    {
-                        v9 = 0;
-                    }
-                    else
-                    {
-                        v9 = &this->strings.threading_rw_check;
-                        if (this != (logger*)-72LL)
-                        {
-                            _InterlockedIncrement(&v9->_state.readers);
-                            if (this->strings._state.writers)
-                            {
-                                while (_InterlockedCompareExchange(&threading::thread_check_lock._lock, -1, 0))
-                                    ;
-                                __debugbreak();
-                                if (this->strings._state.writers)
-                                    debug::fail(
-                                        "0 == _t->_state.writers",
-                                        "cannot read when writing is active",
-                                        "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                                        "threading_rw_check::read_lock::read_lock",
-                                        72);
-                                threading::thread_check_lock._lock = 0;
-                            }
-                        }
-                    }
-                    if (v7 >= this->strings._size)
-                        debug::fail(
-                            "id < count()",
-                            "d:\\trunk\\src\\ucore\\u_vector_base.h",
-                            "uvector_base<8,8,struct vector_base<class allocator_t<8,8>,unsigned int> >::unsafe_at",
-                            76);
-                    v10 = (char*)this->strings._array + v8;
-                    if (v9)
-                    {
-                        if (v9->_state.writers)
-                        {
-                            while (_InterlockedCompareExchange(&threading::thread_check_lock._lock, -1, 0))
-                                ;
-                            __debugbreak();
-                            if (v9->_state.writers)
-                                debug::fail(
-                                    "0 == _t->_state.writers",
-                                    "read exit when writing is active",
-                                    "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                                    "threading_rw_check::read_lock::~read_lock",
-                                    81);
-                            threading::thread_check_lock._lock = 0;
-                        }
-                        _InterlockedDecrement(&v9->_state.readers);
-                    }
-                    if (*v10)
-                        v11 = *v10 + 20LL;
-                    else
-                        v11 = 0;
-                    v12 = def;
-                    if (v11)
-                        v12 = (const char*)v11;
-                    vfs::writer_base_t<vfs::iwriter>::w_string(&f._object->vfs::writer_base_t<vfs::iwriter>, v12);
-                    ++v7;
-                    v8 += 8;
-                } while (v7 < uvector_base<8, 8, vector_base<allocator_t<8, 8>, unsigned int>>::size(&this->strings));
-            }
-            object = f._object;
-            if (f._object)
-            {
-                if (f._object->_ref_count <= 0)
-                    debug::fail(
-                        "0 < *(s32 *)&(o->base_type::_ref_count)",
-                        "d:\\trunk\\src\\ucore\\gtl/intrusive_ptr.h",
-                        "gtl::thread_safe_inc_dec<struct gtl::intrusive_base>::dec",
-                        271);
-                if (!_InterlockedDecrement(&object->_ref_count))
-                {
-                    v14 = gtl::thread_safe_inc_dec<gtl::intrusive_base>::dec_cold<vfs::iwriter>(&f, object);
-                    v15 = f._object;
-                    if (v14)
-                        v15 = 0;
-                    f._object = v15;
-                }
+                vfs::writer_base_t<vfs::iwriter>::w_string(&f._object->vfs::writer_base_t<vfs::iwriter>, strings[i].c_str());
             }
         }
-        MTX->unlock();
+        unlock();
     }
 }
 logger* Log = nullptr;

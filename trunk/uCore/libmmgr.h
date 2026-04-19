@@ -1,5 +1,11 @@
 #pragma once
 
+struct stack_tracer
+{
+	u64 (*_addr)[12];
+	stack_tracer(u64 (*addr)[12]);
+};
+
 class mem_debugger : threading::mutex
 {
 protected:

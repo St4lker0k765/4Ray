@@ -3,11 +3,10 @@
 void slog(const char* s);
 void rlog(const char* format, ...);
 
-class logger
+class logger : public threading::mutex
 {
 protected:
 	bool flush_forced;
-	threading::mutex* MTX;
 public:
 	str_shared fname;
 	u_vector<str_shared> strings;

@@ -16,7 +16,7 @@ enum str_type : u16
 };
 //////////////////////////////////////////////////////////////////////////
 #pragma warning(disable : 4200)
-struct		UCORE_API	str_value
+struct __declspec(align(8)) UCORE_API	str_value
 {
 	str_value*			next;
 	u32					refs;
@@ -101,6 +101,7 @@ public:
 	~str_container();
 
 	str_value*			do_dock(str_c value, u32 s_len, str_type s_type);
+	str_value*			dock(str_c value, u32 len, str_type s_type);
 	str_value*			dock(str_c value, str_type s_type);
 	str_value*			dock_crc(u32 s_crc, str_type s_type);
 	void				clean();

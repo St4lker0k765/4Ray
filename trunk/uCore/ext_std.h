@@ -6,6 +6,7 @@ struct UCORE_API u_token
 	int 	id;
 };
 
+#include <array>
 template <class T, const int shift>
 struct circular_buffer
 {
