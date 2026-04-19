@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "threading.h"
+#include <locale>
 
 threading::mutex::mutex(const char* name)
 {
@@ -61,4 +62,17 @@ bool threading::spin_lock::trylock()
 void threading::spin_lock::unlock()
 {
 	_lock = 0;
+}
+
+void threading::_initialize_fpu()
+{
+	platform.fpu_set24r();
+#pragma todo("Determine meaning of those flags")
+	_mm_setcsr(_mm_getcsr() | 0x8000);
+	_mm_setcsr(_mm_getcsr() | 0x40);
+}
+
+void threading::_initialize_cpu_thread()
+{
+	threading::_initialize_fpu();
 }

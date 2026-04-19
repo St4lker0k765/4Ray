@@ -1,6 +1,47 @@
 #include "stdafx.h"
 #include "log.h"
 
+UCORE_API string_path log_fname;
+
+void flusher(const char* s)
+{
+    Log->flush_to_hdd();
+}
+
+void log_add_callback(LogCallback callback)
+{
+    Log->callbacks.push_back(callback);
+}
+
+void log_create(bool no_log)
+{
+    log_fname[0] = 0;
+    if (!no_log)
+    {
+        LPCSTR l_path = strstr(core.params(), "-logpath");
+        if (l_path)
+        {
+            sscanf(l_path + 8, "%s", log_fname);
+        }
+        else
+        {
+            strcpy_s(log_fname, sizeof(log_fname), core.application_name.c_str());
+            strcat_s(log_fname, sizeof(log_fname), "_");
+            strcat_s(log_fname, sizeof(log_fname), core.user_name.c_str());
+            strcat_s(log_fname, sizeof(log_fname), ".log");
+        }
+        Log->fname = log_fname;
+    }
+
+    if (strstr(core.params(), "-logflush"))
+        log_add_callback(flusher);
+
+    if (!no_log)
+    {
+        rlog("%s build %d, %s, %s\n", "uCore :: 4A platform", build_number(), "Aug  6 2014", "18:20:42");
+    }
+}
+
 void slog(const char* s)
 {
     string4096 split;
@@ -104,8 +145,7 @@ logger::logger()
     callbacks.clear();
 
     MTX = new threading::mutex("log");
-#pragma todo("Implement params for uCore")
-    flush_forced = false; //strstr(core.params, "-forcelog ");
+    flush_forced = strstr(core.params(), "-forcelog ");
 }
 
 logger::~logger()
@@ -206,7 +246,8 @@ void logger::add(const char* split)
             v9 += sizeof(void*);
         } while (id < callbacks.size());
     }
-    if (this->flush_forced)
+
+    if (flush_forced)
         flush_to_hdd();
 }
 
@@ -241,7 +282,7 @@ void logger::flush_to_hdd()
             value = v5->value;
         else
             value = 0;
-        vfs::wopen_os(&f, value);
+        vfs::wopen_os(&f, fname.c_str());
         if (f._object)
         {
             v7 = 0;

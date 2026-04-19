@@ -30,4 +30,6 @@ namespace threading
 		void unlock();
 	};
 	void yield(u32 ms);
+	void _initialize_fpu();
+	void _initialize_cpu_thread();
 };

@@ -34,11 +34,8 @@ UCORE_API str_shared g_levelname;
 class UCORE_API u_core 
 {
 protected:
-	u_string application_name;
 	u_string content_root;
-	u_string user_name;
 	u_string comp_name;
-	u_string game_version;
 	wstring64 ui_game_nick;
 	str_shared _build_key;
 	int _complete_edition;
@@ -53,6 +50,10 @@ protected:
 	volatile float level_loading_time;
 	char dlc_corrupt;
 public:
+	u_string user_name;
+	u_string application_name;
+	u_string game_version;
+
 	u_core();
 	u_core(const u_core* other);
 	~u_core();
@@ -63,13 +64,13 @@ public:
 	bool build_2033();
 	bool build_2034();
 	bool build_33_34();
-	const str_shared* build_key();
+	const str_shared build_key();
 
 	u64 complete_edition();
 	u64 dlc_downloaded() { return 1; }
 	u64 level_downloaded() { return 1; }
 
-	str_shared* menu_level(str_shared* result);
+	str_shared menu_level(str_shared* result);
 	char* params();
 
 	void set_build_key_2033();

@@ -11,11 +11,13 @@ protected:
 public:
 	str_shared fname;
 	u_vector<str_shared> strings;
-	u_vector<void*> callbacks;
+	u_vector<LogCallback> callbacks;
 	logger();
 	virtual ~logger();
 	void add(const char* split);
 	void flush_to_hdd();
 };
+
+typedef void	(*LogCallback)	(LPCSTR string);
 
 extern logger* Log;
