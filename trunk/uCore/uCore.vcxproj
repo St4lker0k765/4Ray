@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -127,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>UCORE_API;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UCORE_EXPORTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -206,6 +206,7 @@
     <ClInclude Include="timing.h" />
     <ClInclude Include="uCore.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="u_compressor.h" />
     <ClInclude Include="u_map.h" />
     <ClInclude Include="u_platform.h" />
     <ClInclude Include="u_random.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="u_vector_base.h" />
     <ClInclude Include="vfs.h" />
     <ClInclude Include="vfs_buffered_io.h" />
+    <ClInclude Include="vfs_package_registry.h" />
     <ClInclude Include="vfs_path_notifier.h" />
     <ClInclude Include="vfs_streams.h" />
     <ClInclude Include="vfs_streams_internal.h" />

@@ -21,7 +21,7 @@ protected:
 	};
 	info infos[];
 	threading::spin_lock qlock;
-	circular_buffer<mem_debugger::info, 9, thread_unsafe_incdec> queue;
+	circular_buffer<mem_debugger::info, 9> queue;
 	u32 count;
 	u32 mopid;
 	int enabled;
@@ -115,3 +115,5 @@ public:
 	void xmem_realloc(char* ptr, u64 size, u64 align, const char* _);
 	void xmem_realloc_aligned(char* ptr, u64 size, const char* _);
 };
+
+extern UCORE_API u_memory* memory();

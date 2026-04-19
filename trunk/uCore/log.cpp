@@ -46,28 +46,27 @@ void slog(const char* s)
 {
     string4096 split;
 
-    u64 v1 = 0;
-    u64 v2 = 0;
-    for (const char* i = s; *i; ++i)
+    int i, j;
+    for (i = 0, j = 0; s[i] != 0; i++) 
     {
-        s = i;
-        if ((BYTE)s == 10)
+        if (s[i] == '\n') 
         {
-            split[v1] = 0;
-            if (!split[0])
-                strcpy(split, " ");
+            split[j] = 0;	// end of line
+            if (split[0] == 0) 
+            { 
+                split[0] = ' '; 
+                split[1] = 0; 
+            }
             Log->add(split);
-            v2 = 0;
-            v1 = 0;
+            j = 0;
         }
-        else
+        else 
         {
-            split[v1] = (char)s;
-            v2++;
-            ++v1;
+            split[j++] = s[i];
         }
     }
-    split[(int)v2] = 0;
+
+    split[j] = 0;
     Log->add(split);
 }
 
@@ -77,8 +76,7 @@ void rlog(const char* format, ...)
     va_list va;
 
     va_start(va, format);
-    int v1 = vsnprintf(buf, sizeof(buf), format, va);
-    if (v1 >= 0)
+    if (vsnprintf(buf, sizeof(buf), format, va) >= 0)
     {
         slog(buf);
     }
@@ -157,94 +155,16 @@ logger::~logger()
 
 void logger::add(const char* split)
 {
-    logger* zero_len_str; // rbx
-    str_container* v5; // rcx
-    __int64 v6; // rax
-    unsigned int v9; // r12d
-    threading_rw_check* v10; // rbx
-    void(__fastcall * *v11)(const char*); // rdi
-
     OutputDebugStringA(split);
     OutputDebugStringA("\n");
+
     MTX->lock();
-    if (split)
-    {
-        if (*split)
-        {
-            v6 = -1;
-            do
-                ++v6;
-            while (split[v6]);
-            zero_len_str = (logger*)g_string_container->do_dock(split, v6, 0);
-        }
-        else
-        {
-            v5 = g_string_container;
-            _InterlockedIncrement(&g_string_container->zero_len_str->refs);
-            zero_len_str = (logger*)v5->zero_len_str;
-        }
-    }
-    else
-    {
-        zero_len_str = 0;
-    }
+    strings.push_back(split);
     MTX->unlock();
-    u32 id = 0;
-    if (callbacks.size())
+
+    for (int i = 0; i < callbacks.size(); i++)
     {
-        v9 = 0;
-        do
-        {
-            if (this == (logger*)-88LL)
-            {
-                v10 = 0;
-            }
-            else
-            {
-                v10 = &this->callbacks.threading_rw_check;
-                if (this != (logger*)-104LL)
-                {
-                    _InterlockedIncrement(&v10->_state.readers);
-                    if (this->callbacks._state.writers)
-                    {
-                        while (_InterlockedCompareExchange(&threading::thread_check_lock._lock, -1, 0))
-                            ;
-                        __debugbreak();
-                        if (this->callbacks._state.writers)
-                            debug::fail(
-                                "0 == _t->_state.writers",
-                                "cannot read when writing is active",
-                                "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                                "threading_rw_check::read_lock::read_lock",
-                                72);
-                        threading::thread_check_lock._lock = 0;
-                    }
-                }
-            }
-            R_ASSERT(id < callbacks.size());
-            v11 = callbacks[v9];
-            if (v10)
-            {
-                if (v10->_state.writers)
-                {
-                    while (_InterlockedCompareExchange(&threading::thread_check_lock._lock, -1, 0))
-                        ;
-                    __debugbreak();
-                    if (v10->_state.writers)
-                        debug::fail(
-                            "0 == _t->_state.writers",
-                            "read exit when writing is active",
-                            "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                            "threading_rw_check::read_lock::~read_lock",
-                            81);
-                    threading::thread_check_lock._lock = 0;
-                }
-                _InterlockedDecrement(&v10->_state.readers);
-            }
-            (*v11)(split);
-            ++id;
-            v9 += sizeof(void*);
-        } while (id < callbacks.size());
+        callbacks[i](split);
     }
 
     if (flush_forced)
@@ -253,10 +173,6 @@ void logger::add(const char* split)
 
 void logger::flush_to_hdd()
 {
-    const char* buf; // rbx
-    int v4; // eax
-    str_value* v5; // rdx
-    const char* value; // rdx
     unsigned int v7; // r15d
     unsigned int v8; // r12d
     threading_rw_check* v9; // rbx
@@ -277,11 +193,6 @@ void logger::flush_to_hdd()
             rlog("%s build %d[SVN=%s], %s, %s\n", "uCore :: 4A platform", build_number(), core.game_version.c_str(), __DATE__, __TIME__);
         }
         MTX->lock();
-        v5 = this->fname.p_;
-        if (v5)
-            value = v5->value;
-        else
-            value = 0;
         vfs::wopen_os(&f, fname.c_str());
         if (f._object)
         {

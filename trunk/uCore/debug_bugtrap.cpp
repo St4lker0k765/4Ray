@@ -19,7 +19,7 @@ void bugtrap_show()
         if (GetThreadContext(BTHandle, &Context))
         {
             _EXCEPTION_POINTERS ep;
-            ep.ExceptionRecord = nullptr;
+            ep.ExceptionRecord = 0;
             ep.ContextRecord = &Context;
             BT_SehFilter(&ep);
             CloseHandle(BTHandle);
@@ -27,7 +27,7 @@ void bugtrap_show()
     }
 }
 
-void __fastcall bugtrap_handler(__int64 nErrHandlerParam)
+void __stdcall bugtrap_handler(INT_PTR nErrHandlerParam)
 {
     const char* DialogMessage; // rax
     str_shared result; // [rsp+38h] [rbp+10h] BYREF

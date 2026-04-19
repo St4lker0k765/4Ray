@@ -8,7 +8,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     {
         case DLL_THREAD_DETACH:
         {
-            memory().thread_detach();
+            memory()->thread_detach();
         }
 	    case DLL_PROCESS_ATTACH:
         {
@@ -18,7 +18,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
             _control87(_RC_CHOP, _MCW_RC);
             _control87(_RC_NEAR, _MCW_RC);
             _control87(_EM_DENORMAL | _EM_INEXACT, _MCW_EM);
-            memory().thread_attach();
+            memory()->thread_attach();
         }
     }
     return TRUE;
@@ -35,6 +35,45 @@ u_core::u_core()
     _build_key = "";
     params_valid = false;
     human_move_ng_mode = 0;
+}
+
+void log_flush(str_shared* result);
+
+void u_core::_destroy(UINT res)
+{
+    if (init_counter-- == 1)
+    {
+        str_shared result; // [rsp+50h] [rbp+18h] BYREF
+        log_flush(&result);
+        if (vfs::registry_exists())
+        {
+            delete vfs::registry();
+        }
+    }
+    vfs::trace.end();
+    TerminateProcess(GetCurrentProcess(), res);
+}
+
+u_core::u_core(const u_core* other)
+{
+    application_name = other->application_name;
+    content_root = other->content_root;
+    user_name = other->user_name;
+    comp_name = other->comp_name;
+    game_version = other->game_version;
+    _build_key = other->_build_key;
+    wcscpy(ui_game_nick, other->ui_game_nick);
+    strcpy(params_string, other->params_string);
+    _complete_edition = other->_complete_edition;
+    params_valid = other->params_valid;
+    trace = other->trace;
+    human_move_ng_mode = other->human_move_ng_mode;
+    io_log = other->io_log;
+    package_downloading = other->package_downloading;
+    package_downloading_progress = other->package_downloading_progress;
+    level_loading_progress = other->level_loading_progress;
+    level_loading_time = other->level_loading_time;
+    dlc_corrupt = other->dlc_corrupt;
 }
 
 void bugtrap_attach_process();

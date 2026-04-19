@@ -21,3 +21,4 @@ public:
 typedef void	(*LogCallback)	(LPCSTR string);
 
 extern logger* Log;
+extern UCORE_API string_path log_fname;

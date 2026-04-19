@@ -39,6 +39,11 @@ void threading::yield(u32 ms)
 	Sleep(ms);
 }
 
+threading::spin_lock::spin_lock()
+{
+	_lock = 0;
+}
+
 bool threading::spin_lock::check_lock(u32 value)
 {
 	return value == _lock;

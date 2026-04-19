@@ -1,6 +1,16 @@
 #include "stdafx.h"
 #include "libmmgr.h"
 
+u_memory* memInstance = nullptr;
+UCORE_API u_memory* memory()
+{
+    if (!memInstance)
+    {
+        memInstance = new u_memory();
+    }
+    return memInstance;
+}
+
 u_memory::u_memory()
 {
     mem_debugger* v4; // rax
@@ -13,12 +23,7 @@ u_memory::u_memory()
     debug = nullptr;
     if (strstr(GetCommandLineA(), "-memdbg"))
     {
-        mem_debugger* v4 = u_alloc<mem_debugger>(1u);
-        if (v4)
-            mem_debugger::mem_debugger(v4);
-        else
-            v5 = 0;
-        debug = v5;
+        debug = new mem_debugger();
     }
     stat_calls = 0;
 }

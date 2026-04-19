@@ -20,6 +20,7 @@ namespace threading
 	protected:
 		volatile int _lock = 0;
 	public:
+		spin_lock();
 		~spin_lock() {}
 		bool check_lock(u32 value);
 		void lock();

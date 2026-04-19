@@ -15,21 +15,22 @@
 #endif
 
 #include "debug.h"
-#include "u_string.h"
 #include "ext_std.h"
 #include "ext_stl.h"
+#include "u_string.h"
+#include "libmmgr_shared.h"
 #include "vfs.h"
 #include "log.h"
 #include "u_platform.h"
 #include "libmmgr.h"
 #include "u_random.h"
+#include "u_compressor.h"
 
 UCORE_API str_shared g_levelname;
 
 #define BUILD_ID_2033 "2033"
 #define BUILD_ID_2034 "2034"
 #define BUILD_ID_33_34 "33_34"
-
 
 class UCORE_API u_core 
 {
@@ -56,7 +57,6 @@ public:
 
 	u_core();
 	u_core(const u_core* other);
-	~u_core();
 
 	void _initialize(LPCSTR application_name, LPCSTR _data_path, bool no_log);
 	void _destroy(UINT res);

@@ -60,6 +60,7 @@ namespace std
 };
 
 // vector
+#include <vector>
 template	<typename T, typename allocator = u_alloc<T> >
 class u_vector : public std::vector<T,allocator> {
 private:
