@@ -158,10 +158,11 @@
     <ClCompile Include="log.cpp" />
     <ClCompile Include="progress_manager.cpp" />
     <ClCompile Include="threading.cpp" />
-    <ClCompile Include="timing.cpp" />
+    <ClCompile Include="libtimer.cpp" />
+    <ClCompile Include="tlsf.c" />
     <ClCompile Include="uCore.cpp" />
     <ClCompile Include="u_compressor.cpp" />
-    <ClCompile Include="u_platform.cpp" />
+    <ClCompile Include="libplatform.cpp" />
     <ClCompile Include="u_string.cpp" />
     <ClCompile Include="vfs.cpp" />
     <ClCompile Include="vfs_buffered_io.cpp" />
@@ -203,13 +204,14 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threading.h" />
     <ClInclude Include="threading_rw_check.h" />
-    <ClInclude Include="timing.h" />
+    <ClInclude Include="libtimer.h" />
+    <ClInclude Include="tlsf.h" />
     <ClInclude Include="uCore.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="u_compressor.h" />
     <ClInclude Include="u_map.h" />
-    <ClInclude Include="u_platform.h" />
-    <ClInclude Include="u_random.h" />
+    <ClInclude Include="libplatform.h" />
+    <ClInclude Include="librandom.h" />
     <ClInclude Include="u_string.h" />
     <ClInclude Include="u_svector.h" />
     <ClInclude Include="u_taskpool.h" />
@@ -224,7 +226,7 @@
     <ClInclude Include="vfs_trace.h" />
     <ClInclude Include="vfs_utils.h" />
     <ClInclude Include="ext_std.h" />
-    <ClInclude Include="_types.h" />
+    <ClInclude Include="libtypes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

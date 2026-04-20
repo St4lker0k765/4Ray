@@ -33,3 +33,4 @@ namespace vfs
 }
 
 #include "vfs_package_registry.h"
+#include "vfs_trace.h"

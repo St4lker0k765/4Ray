@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <malloc.h>
 #include "fastdelegate.h"
-#include "_types.h"
+#include "libtypes.h"
 #include "threading.h"
 
 #ifdef UCORE_EXPORTS
@@ -21,9 +21,9 @@
 #include "libmmgr_shared.h"
 #include "vfs.h"
 #include "log.h"
-#include "u_platform.h"
+#include "libplatform.h"
 #include "libmmgr.h"
-#include "u_random.h"
+#include "librandom.h"
 #include "u_compressor.h"
 
 UCORE_API str_shared g_levelname;

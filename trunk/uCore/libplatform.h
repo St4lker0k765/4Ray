@@ -21,10 +21,10 @@ protected:
 		float to_milisec;
 		float to_microsec;
 	};
+public:
 	_cvt qpc;
 	_cvt cycles;
 	u32 os_allocgranularity;
-public:
 	void initialize_begin();
 	void initialize_end();
 

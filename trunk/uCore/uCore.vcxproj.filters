@@ -123,10 +123,13 @@
     <ClCompile Include="u_string.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="timing.cpp">
+    <ClCompile Include="libtimer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="u_platform.cpp">
+    <ClCompile Include="libplatform.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="tlsf.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -236,7 +239,7 @@
     <ClInclude Include="vfs_path_notifier.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="_types.h">
+    <ClInclude Include="libtypes.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -254,13 +257,22 @@
     <ClInclude Include="vfs.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="timing.h">
+    <ClInclude Include="libtimer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="u_platform.h">
+    <ClInclude Include="libplatform.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="u_random.h">
+    <ClInclude Include="librandom.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="u_compressor.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="vfs_package_registry.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="tlsf.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

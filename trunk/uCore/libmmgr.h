@@ -91,7 +91,7 @@ public:
 	void _heap(void** memblock, u64* memsize);
 	void _loss();
 	void _state_diff(u32 state_id);
-	void _state_pointer();
+	u32 _state_pointer();
 	void _stats(bool output_debug_string, bool vm);
 	u64 _usage(u32* p_blocks_used, u32 *p_blocks_free);
 	u64 _usage_2(u64* total, u64* largest_block);
@@ -99,7 +99,7 @@ public:
 	const u_memory::poolreg front_pool();
 	// Another debug function?
 	void log_usage(bool output_debug_string) {}
-	void main_realloc(void* ptr, u64 size, u64 align, const char* _, bool allow_out_of_memory);
+	void* main_realloc(void* ptr, u64 size, u64 align, const char* _, bool allow_out_of_memory);
 
 	void mblock_lock(void* p) {}
 	u64 mblock_size(void* ptr, u32 alignment);
@@ -110,7 +110,7 @@ public:
 	void pool_destroy(void* pool);
 	char* pool_realloc(void* pool, char* p, size_t size, u64 align, const char* _, bool allow_out_of_memory);
 	void pool_validate(void* pool);
-	void pools0info(u64* memblock, u64* memsize);
+	void pools0info(void* memblock, u64* memsize);
 
 	bool ptr_on_stack(u64 p);
 	void thread_attach();

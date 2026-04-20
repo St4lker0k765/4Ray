@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "timing.h"
+#include "libtimer.h"
 
 void timing::timer::start()
 {
