@@ -66,89 +66,55 @@ void u_memory::pool_destroy(void* pool)
 
 char* u_memory::pool_realloc(void* pool, char* p, size_t size, u64 align, const char* _, bool allow_out_of_memory)
 {
-    u_svector<u_memory::poolreg, 6, unsigned short>* p_pools; // r14
-    unsigned __int8 v14; // r12
-    char* v16; // rdi
-    u64 current_size; // r14
-    char* result; // rax
-    size_t v21; // rdi
-    char* v22; // rax
-    char* v24; // rbx
-
-    p_pools = &this->pools;
-    PDWORD v9 = 0;
-    PDWORD pa = 0;
+    u64 current_size = 0; // r14
     u64 current_mblock = 0;
-    v14 = 0;
-    if (!uvector_base<40, 8, svector_base<40, 8, 6, unsigned short>>::size(&this->pools))
+    threading::spin_lock current_lock = nullptr;
+    for (int i = 0; i < pools.size(); i++)
     {
-    LABEL_24:
-        current_size = 0;
-        goto LABEL_25;
-    }
-    
-    if (pools.size())
-    {
-
-    }
-
-
-    while (1)
-    {
-        v16 = &p_pools->data.storage[(unsigned int)(40 * current_mblock)];
-        if (*((void**)v16 + 1) != pool)
-            goto LABEL_22;
-        if (!_InterlockedCompareExchange((volatile signed __int32*)v16 + 8, -1, 0))
-            break;
-        Debug.fatal(" !!! pool_realloc() threading check fail !!!");
-    LABEL_22:
-        current_mblock = ++v14;
-        if (v14 >= uvector_base<40, 8, svector_base<40, 8, 6, unsigned short>>::size(p_pools))
+        u_memory::poolreg v16 = pools[i];
+        if (v16.pool == pool)
         {
-            v9 = 0;
-            current_mblock = 0;
-            goto LABEL_24;
+            current_size = v16.memsize;
+            current_lock = v16.lock;
+            current_mblock = (u64)v16.memblock;
+            break;
         }
     }
-    current_size = *((_QWORD*)v16 + 3);
-    v9 = v16 + 32;
-    current_mblock = *((_QWORD*)v16 + 2);
-    pa = v9;
-LABEL_25:
+    threading::spin_lock pa = current_lock;
     if (p)
     {
         R_ASSERT(uintptr_t(p)>=current_mblock);
         R_ASSERT(uintptr_t(p)<(current_mblock+current_size));
     }
-    if (!v9)
-        debug::fail("current_lock", "libmmgr_pool.cpp", "u_memory::pool_realloc", 399);
+    R_ASSERT(&current_lock);
     if (size)
     {
         if ((size & 0xF) != 0)
             align = 4;
         if (p)
         {
-            v21 = tlsf_block_size(p);
+            size_t v21 = tlsf_block_size(p);
             if (size >= v21)
             {
+                char* v22; // rax
                 if (align < 0x10)
                     v22 = (char*)tlsf_malloc(pool, size);
                 else
                     v22 = (char*)tlsf_memalign(pool, align, size);
-                v24 = v22;
                 if (debug)
                     debug->_alloc(v22, size, _);
-                if ((unsigned int)size < (unsigned int)v21)
-                    v21 = (unsigned int)size;
-                memcpy(v24, p, v21);
+                if (size < v21)
+                    v21 = size;
+                memcpy(v22, p, v21);
                 if (debug)
                     debug->_free(p);
                 tlsf_free(pool, p);
-                p = v24;
+                p = v22;
             }
         }
         else
         {
+            char* result; // rax
             if (align < 0x10)
                 result = (char*)tlsf_malloc(pool, size);
             else
@@ -158,7 +124,7 @@ LABEL_25:
             {
                 if (allow_out_of_memory)
                 {
-                    *pa = 0;
+                    pa = 0;
                     return result;
                 }
                 _stats(0, 0);
@@ -167,11 +133,11 @@ LABEL_25:
             if (debug)
             {
                 debug->_alloc(p, size, _);
-                *pa = 0;
+                pa = 0;
                 return p;
             }
         }
-        *pa = 0;
+        pa = 0;
         return p;
     }
     else
@@ -182,7 +148,7 @@ LABEL_25:
                 debug->_free(p);
             tlsf_free(pool, p);
         }
-        *v9 = 0;
+        current_lock = 0;
         return 0;
     }
 }

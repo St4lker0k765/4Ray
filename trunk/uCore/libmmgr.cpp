@@ -224,18 +224,6 @@ u32 u_memory::_state_pointer()
 
 void u_memory::_stats(bool output_debug_string, bool vm)
 {
-    u_svector<u_memory::poolreg, 6, unsigned short>* p_pools; // rdi
-    __int64 v9; // rbx
-    float v11; // xmm0_4
-    unsigned int v12; // eax
-    float v13; // xmm0_4
-    float v14; // xmm1_4
-    __int64 v15; // rbx
-    float v17; // xmm0_4
-    float v19; // xmm0_4
-    float v20; // xmm1_4
-    u64 load[2]; // [rsp+50h] [rbp-158h] BYREF
-
     if (g_string_container)
         g_string_container->clean();
 
@@ -246,54 +234,37 @@ void u_memory::_stats(bool output_debug_string, bool vm)
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(),  0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
 
-    p_pools = &this->pools;
+    u64 load[2];
     load[0] = 0;
     load[1] = 0;
     lock();
     tlsf_walk_pool(pools.front().pool, 0, load);
     unlock();
 
-    v9 = pools.front().memsize;
-    v11 = (float)SLODWORD(load[0]);
-    v12 = v10 * 1024;
-    if ((load[0] & 0x8000000000000000uLL) != 0LL)
-        v11 = v11 + 1.8446744e19;
-    v13 = load[0] * 100.0;
-    v14 = (float)(int)v9;
-    if (v9 < 0)
-        v14 = v14 + 1.8446744e19;
+    u64 size = pools.front().memsize;
     rlog(
-        "- pool (%10s): %2.1f load : %zdK total, %dK used, %dK largest block, %dK str_shared",
+        "- pool (%10s): %2.1f load : %dK total, %dK used, %dK largest block, %dK str_shared",
         pools.front().desc,
-        (float)(v13 / v14),
-        v9 * 1024,
+        (float)(load[0] * 100 / size),
+        size * 1024,
         load[0] * 1024,
         load[1] * 1024,
         g_string_container->stats() * 1024);
     if (output_debug_string)
     {
-        v15 = *((_QWORD*)&pools.data.align + 3);
-        v17 = (float)SLODWORD(load[0]);
-        if ((load[0] & 0x8000000000000000uLL) != 0LL)
-            v17 = v17 + 1.8446744e19;
-        v19 = v17 * 100.0;
-        v20 = (float)(int)v15;
-        if (v15 < 0)
-            v20 = v20 + 1.8446744e19;
-
-        string_path str; // [rsp+60h] [rbp-148h] BYREFy
+        string_path str;
         sprintf_s(
             str,
             sizeof(str),
             "- pool (%10s): %2.1f load : %dK total, %dK used, %dK free, %dK largest block, %dK str_shared\n",
             pools.front().desc,
-            (float)(v19 / v20),
-            (unsigned __int64)v15 >> 10,
-            load[0] >> 10,
-            (v15 - load[0]) >> 10,
-            load[1] >> 10,
+            (float)(load[0] * 100.0 / size),
+            size * 1024,
+            load[0] * 1024,
+            (size - load[0]) * 1024,
+            load[1] * 1024,
             g_string_container->stats() * 1024);
         OutputDebugStringA(str);
     }
@@ -341,4 +312,83 @@ u64 u_memory::_usage_2(u64* total, u64* largest_block)
         *largest_block = load[1];
 
     return load[0];
+}
+
+volatile void* xmem_pool = nullptr;
+threading::mutex xmem_lock;
+
+#define XMEM_SIZE 0x8000000u
+void u_memory::xmem_enable()
+{
+    xmem_lock.lock();
+    if (!xmem_pool)
+    {
+        void* alloc = main_realloc(0, XMEM_SIZE, 0x10u, "xmem", 0);
+        if (alloc)
+            xmem_pool = pool_create("xmem", XMEM_SIZE, alloc);
+    }
+    xmem_lock.unlock();
+}
+
+void u_memory::xmem_free(void* ptr, const char* _)
+{
+    xmem_realloc((char*)ptr, 0, 0, _);
+}
+
+char* u_memory::xmem_realloc_aligned(char* ptr, u64 size, const char* _)
+{
+    return xmem_realloc(ptr, (size + 63) & 0xFFFFFFFFFFFFFFC0uLL, 0x40u, _);
+}
+
+char* u_memory::xmem_realloc(
+    char* ptr,
+    u64 size,
+    u64 align,
+    const char* _)
+{
+    u64 v6 = size;
+    char* v7 = ptr;
+    bool v9 = ptr >= xmem_pool && ptr <= (char*)xmem_pool + XMEM_SIZE;
+    if (!xmem_pool)
+        return (char*)main_realloc(ptr, size, align, _, 0);
+    if (!size)
+    {
+        if (v9)
+        {
+            xmem_lock.lock();
+            v7 = pool_realloc(&xmem_pool, v7, 0, align, _, 0);
+            xmem_lock.unlock();
+            return v7;
+        }
+        size = 0;
+        return (char*)main_realloc(ptr, size, align, _, 0);
+    }
+    if (ptr)
+    {
+        int v14 = mblock_size(ptr, 0);
+        if (v14 >= v6)
+            return v7;
+        char* ptra = (char*)xmem_realloc(0, v6, align, _);
+        u32 v15 = v6 + ((v14 - v6) & ((v14 - (int)v6) >> 31));
+        memcpy(ptra, v7, v15);
+        xmem_realloc(v7, 0, 0, _);
+        return ptra;
+    }
+    else
+    {
+        lock();
+        char* v11 = pool_realloc(&xmem_pool, 0, v6, align, _, 1);
+        unlock();
+        if (v11)
+        {
+            return v11;
+        }
+        else
+        {
+            lock();
+            char* v13 = pool_realloc(pools.front().pool, 0, v6, align, _, 1);
+            unlock();
+            return v13;
+        }
+    }
 }

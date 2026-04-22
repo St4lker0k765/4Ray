@@ -118,8 +118,8 @@ public:
 
 	void xmem_enable();
 	void xmem_free(void* ptr, const char* _);
-	void xmem_realloc(char* ptr, u64 size, u64 align, const char* _);
-	void xmem_realloc_aligned(char* ptr, u64 size, const char* _);
+	char* xmem_realloc(char* ptr, u64 size, u64 align, const char* _);
+	char* xmem_realloc_aligned(char* ptr, u64 size, const char* _);
 };
 
 extern UCORE_API u_memory* memory();
