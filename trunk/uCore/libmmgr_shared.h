@@ -114,5 +114,30 @@ public:
 	u64					stats();
 };
 UCORE_API	extern		str_container* g_string_container;
+//////////////////////////////////////////////////////////////////////////
+struct smem_value // sizeof=0x20;variable_size
+{
+	smem_value * next;
+	volatile int reference;
+	u32 crc;
+	u32 length;
+	void* padding;
+	char value[];
+};
+//////////////////////////////////////////////////////////////////////////
+class UCORE_API smem_container : public threading::mutex
+{
+protected:
+	u_vector<smem_value*> buckets;
+public:
+	smem_container();
+	smem_container(const smem_container* other);
+	virtual ~smem_container();
 
+	void clean();
+	smem_value* dock(u32 crc, u32 count, u32 elen, char* ptr);
+	void integrity() {}
+};
+
+UCORE_API extern smem_container* g_shared_memory_container;
 #pragma pack(pop)

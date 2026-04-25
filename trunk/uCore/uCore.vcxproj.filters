@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="gtl">
+      <UniqueIdentifier>{412fdef0-2355-4fa5-a0b6-0ee4da4ecda9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="archive_stream.cpp">
@@ -273,6 +276,18 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="tlsf.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="gtl\intrusive_ptr.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="gtl\intrusive_ptr_inline.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="gtl\object_type_traits.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="vfs_x_reader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

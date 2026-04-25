@@ -172,7 +172,7 @@ void logger::add(const char* split)
 
 void logger::flush_to_hdd()
 {
-    gtl::intrusive_ptr<vfs::iwriter, gtl::intrusive_base, gtl::intrusive_default_functionality, gtl::thread_safe_inc_dec<gtl::intrusive_base> > f; // [rsp+60h] [rbp+8h] BYREF
+    intrusive_ptr<vfs::iwriter, intrusive_base> f; // [rsp+60h] [rbp+8h] BYREF
 
     if (fname.size())
     {

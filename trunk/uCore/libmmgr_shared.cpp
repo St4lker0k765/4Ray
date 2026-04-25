@@ -2,6 +2,7 @@
 #include "u_string.h"
 
 UCORE_API	str_container* g_string_container = nullptr;
+UCORE_API smem_container* g_shared_memory_container = nullptr;
 
 str_container::str_container()
 {
@@ -217,4 +218,32 @@ void str_container::gc_step()
             gc_iterator = next;
         }
     }*/
+}
+
+smem_container::smem_container()
+{
+	threading::mutex::mutex("memory::shared::block");
+	buckets.clear();
+}
+
+smem_container::~smem_container()
+{
+	clean();
+	buckets.clear();
+}
+
+void smem_container::clean()
+{
+    lock();
+    for (int i = 0; i < buckets.size(); i++)
+    {
+		buckets.pop_back();
+    }
+    unlock();
+}
+
+smem_container::smem_container(const smem_container* other)
+{
+	_os = other->_os;
+	buckets = other->buckets;
 }

@@ -191,6 +191,9 @@
     <ClInclude Include="debug.h" />
     <ClInclude Include="ext_stl.h" />
     <ClInclude Include="fastdelegate.h" />
+    <ClInclude Include="gtl\intrusive_ptr.h" />
+    <ClInclude Include="gtl\intrusive_ptr_inline.h" />
+    <ClInclude Include="gtl\object_type_traits.h" />
     <ClInclude Include="libbitwise.h" />
     <ClInclude Include="libmmgr.h" />
     <ClInclude Include="libmmgr_shared.h" />
@@ -227,6 +230,7 @@
     <ClInclude Include="vfs_utils.h" />
     <ClInclude Include="ext_std.h" />
     <ClInclude Include="libtypes.h" />
+    <ClInclude Include="vfs_x_reader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

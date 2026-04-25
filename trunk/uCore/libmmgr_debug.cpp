@@ -86,6 +86,30 @@ stack_tracer::stack_tracer(u64 (*addr)[12])
     }
 }
 
+mem_debugger::mem_debugger()
+{
+    threading::mutex::mutex("mem_debugger");
+
+    queue.readptr = 0;
+    queue.counter = 0;
+    enabled = 1;
+
+    lock();
+
+    records = (mem_debugger::record*)_aligned_malloc(0x1000000u, 0x10u);
+    R_ASSERT2(records, "not enough memory for records");
+
+    infos = (mem_debugger::info*)_aligned_malloc(0x1B000000u, 0x10u);
+    R_ASSERT2(infos, "not enough memory for infos");
+
+    count = 0;
+    mt = 1;
+    _alloc(this, 0, "the mem-debugger itself");
+    if (mt)
+        _beginthread((_beginthread_proc_type)helper, 0, 0);
+    unlock();
+}
+
 void mem_debugger::_alloc(void* ptr, u32 size, const char* desc)
 {
     R_ASSERT(ptr);
@@ -106,4 +130,70 @@ void mem_debugger::_alloc(void* ptr, u32 size, const char* desc)
         else
             _execute(&I);
     }
+}
+
+void mem_debugger::_append(mem_debugger::info* I)
+{
+    while (TRUE)
+    {
+        mem_debugger::info op; // [rsp+20h] [rbp-108h] BYREF
+        op.ptr = 0;
+        while (_InterlockedCompareExchange(&qlock._lock, -1, 0))
+            ;
+        if (circular_buffer<mem_debugger::info, 9, thread_unsafe_incdec>::write_tail(&this->queue, I))
+            break;
+        circular_buffer<mem_debugger::info, 9, thread_unsafe_incdec>::read(&this->queue, &op);
+        lock();
+        this->qlock._lock = 0;
+        R_ASSERT(op.ptr);
+        _execute(&op);
+        unlock();
+    }
+    qlock.unlock();
+}
+
+void mem_debugger::_free(void* ptr)
+{
+    if (ptr && enabled)
+    {
+        mem_debugger::info I;
+        I.ptr = ptr;
+        I.size = -1;
+
+        if (!mt)
+            _execute(&I);
+        else
+            _append(&I);
+    }
+}
+
+void mem_debugger::dump()
+{
+    dump_memory(0xFFFFFFFF, "u:\\memdump%d.csv");
+}
+
+void mem_debugger::dump_prepare()
+{
+    lock();
+    cleanup();
+    for (u32 i = 0; i < count; ++i)
+    {
+        mem_debugger::info* v5 = &infos[i];
+        if (IsBadReadPtr(v5->desc, 4u))
+            v5->desc = "unknown";
+        else
+            v5->desc = _strdup(v5->desc);
+
+        if (sym_ok())
+        {
+            string4096 v6;
+            dump_callstack(v5->funcs, v5->addr, v6, sizeof(v6), GetCurrentProcess(), 10);
+        }
+    }
+    unlock();
+}
+
+void mem_debugger::state_diff(u32 state_id)
+{
+    dump_memory(state_id, "u:\\memdiff%d.csv");
 }

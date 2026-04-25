@@ -7,6 +7,7 @@
 #include "fastdelegate.h"
 #include "libtypes.h"
 #include "threading.h"
+#include "gtl/intrusive_ptr.h"
 
 #ifdef UCORE_EXPORTS
 #define UCORE_API __declspec(dllexport)
@@ -19,6 +20,7 @@
 #include "ext_stl.h"
 #include "u_string.h"
 #include "libmmgr_shared.h"
+#include <io.h>
 #include "vfs.h"
 #include "log.h"
 #include "libplatform.h"
