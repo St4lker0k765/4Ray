@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <malloc.h>
+#include <typeinfo>
 #include "fastdelegate.h"
 #include "libtypes.h"
 #include "threading.h"
@@ -16,6 +17,13 @@
 #endif
 
 #include "debug.h"
+#include "libmath.h"
+#include "librandom.h"
+#include "libvec2.h"
+#include "libvec3.h"
+#include "libvec4.h"
+#include "libmatrix.h"
+#include "libmatrix43.h"
 #include "ext_std.h"
 #include "ext_stl.h"
 #include "u_string.h"
@@ -25,7 +33,6 @@
 #include "log.h"
 #include "libplatform.h"
 #include "libmmgr.h"
-#include "librandom.h"
 #include "u_compressor.h"
 
 UCORE_API str_shared g_levelname;

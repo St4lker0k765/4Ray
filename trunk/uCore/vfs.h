@@ -1,6 +1,6 @@
 #pragma once
 
-typedef intrusive_ptr<vfs::ireader, intrusive_base>* ireader_ptr;
+#include "vfs_streams.h"
 typedef intrusive_ptr<vfs::iwriter, intrusive_base>* iwriter_ptr;
 namespace vfs 
 {
@@ -28,17 +28,6 @@ namespace vfs
 		u64 size;
 		u32 attrib;
 	};
-	class reader_base
-	{
-		const u8* __data;
-		u32 __pos;
-		u32 __size;
-		u32 __iterpos;
-	};
-	class ireader : public reader_base
-	{
-
-	};
 	void add_extension(char** dst, string1024* exts, const char* info, char* ext);
 	u_string append_name_prefix(u_string result, const char* fn);
 	void check_file_name(char* fn);
@@ -46,7 +35,7 @@ namespace vfs
 	void commit_copying(u_vector<str_shared> list);
 	void copy_resource(u32 type, const char* res_name);
 	void critical_io_error(const char* path, const char* expr, const char* file, const char* func, int line);
-	void dll_get_func<void* (void*, u32, u32, u32)>(
+	void dll_get_func(
 		void* (** func)(void*, u32, u32, u32),
 		HMODULE hm,
 		const char* func_name);
@@ -82,15 +71,15 @@ namespace vfs
 	void mark(const char* name) {}
 	u64 package_version();
 	void path_build_os(char* path);
-	void rbuffered(const char* fn, const fastdelegate::FastDelegate<bool __cdecl(void*&, u64)>* cb);
-	void rbuffered_os(const char* fn, const fastdelegate::FastDelegate<bool __cdecl(void*&, u64)>* cb);
-	void rbuffered_package(vfs::package_registry* package, const char* fn, const fastdelegate::FastDelegate<bool __cdecl(void*&, u64)>* cb, const int force_raw);
+	void rbuffered(const char* fn, const fastdelegate::FastDelegate<bool (void*&, u64)>* cb);
+	void rbuffered_os(const char* fn, const fastdelegate::FastDelegate<bool (void*&, u64)>* cb);
+	void rbuffered_package(vfs::package_registry* package, const char* fn, const fastdelegate::FastDelegate<bool(void*&, u64)>* cb, const int force_raw);
 	void registry();
 	bool registry_exists();
-	ireader_ptr ropen(ireader_ptr result, const char* fn);
-	ireader_ptr ropen_os(ireader_ptr result, char* fn);
-	ireader_ptr ropen_package(ireader_ptr result, vfs::package_registry* package, const char* fn, bool force_raw, u32* uncompressed_size);
-	ireader_ptr ropen_raw(ireader_ptr result, char* fn);
+	vfs::ireader ropen(vfs::ireader result, const char* fn);
+	vfs::ireader ropen_os(vfs::ireader result, char* fn);
+	vfs::ireader ropen_package(vfs::ireader result, vfs::package_registry* package, const char* fn, bool force_raw, u32* uncompressed_size);
+	vfs::ireader ropen_raw(vfs::ireader result, char* fn);
 	u64 test_package_permanent(const char* fn);
 	__time64_t to_time_t(const _SYSTEMTIME* st);
 	intrusive_base* wopen_ex(intrusive_base* result, const char* fn);

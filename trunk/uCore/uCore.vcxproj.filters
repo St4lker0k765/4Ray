@@ -111,9 +111,6 @@
     <ClCompile Include="vfs_query.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="vfs_streams.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="vfs_trace.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -133,6 +130,9 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="tlsf.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="vfs_streams.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,9 +185,6 @@
     <ClInclude Include="libstr.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="libvector_pc.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="progress_item.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -225,9 +222,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="vfs_buffered_io.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="vfs_streams.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="vfs_streams_internal.h">
@@ -288,6 +282,27 @@
       <Filter>gtl</Filter>
     </ClInclude>
     <ClInclude Include="vfs_x_reader.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="vfs_streams.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libvec2.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libvec3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libvec4.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libmath.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libmatrix.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libmatrix43.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

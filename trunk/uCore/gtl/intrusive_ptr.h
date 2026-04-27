@@ -24,7 +24,7 @@ struct intrusive_base
 	inline void	_release		(T*object)
 	{
 		try {
-			xr_delete	(object);
+			delete	(object);
 		}
 		catch(...) 
 		{

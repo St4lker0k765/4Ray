@@ -183,11 +183,11 @@ void logger::flush_to_hdd()
         }
         lock();
         vfs::wopen_os(&f, fname.c_str());
-        if (f._object)
+        if (f.get())
         {
             for (int i = 0; i < strings.size(); i++)
             {
-                vfs::writer_base_t<vfs::iwriter>::w_string(&f._object->vfs::writer_base_t<vfs::iwriter>, strings[i].c_str());
+                vfs::writer_base_t<vfs::iwriter>::w_string(&f.get()->vfs::writer_base_t<vfs::iwriter>, strings[i].c_str());
             }
         }
         unlock();

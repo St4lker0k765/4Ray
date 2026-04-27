@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "vfs_x_reader.h"
+#include <fcntl.h>
 
 vfs::x_reader::x_reader()
 {
@@ -57,7 +58,7 @@ bool vfs::x_reader::invalid()
 u64 vfs::x_reader::open(const char* path, const int sequential)
 {
     R_ASSERT(!opened());
-    int flags = (sequential != 0 ? 0x20 : 0) | 0x8000;
+    int flags = (sequential != 0 ? _O_SEQUENTIAL : _O_RDONLY) | _O_BINARY;
     _h = ::open(path, flags);
     if (_h != -1)
     {
