@@ -75,4 +75,47 @@ namespace vfs
 		bool chunk_try_open_at_current_position(u32 ID, u32* size);
 		bool chunk_try_open_at_current_position(u32 ID, ireader* result);
 	};
+
+	class writer_base_t
+	{
+	protected:
+		u_stack<u32> chunk_pos{};
+		str_shared f_name = "";
+	public:
+		void chunk_close();
+		void chunk_open(u32 type);
+		u64 chunk_size();
+		void chunk_write(u32 type, void* data, u32 size);
+		str_shared file_name();
+		void seek(u32 pos);
+		u32 tell();
+		bool valid();
+
+		void w(const void* ptr, u64 count);
+		void w1(const void* ptr);
+		void w12(const void* ptr);
+		void w12_4(s32 v0, s32 v1, s32 v2);
+		void w16(const void* ptr);
+		void w16_4(const void* ptr);
+		void w2(const void* ptr);
+		void w4(const void* ptr);
+		void w4_4(s32 v);
+		void w8(const void* ptr);
+		void w8_4(s32 v0, s32 v1);
+
+		void w_angle16(float a);
+		void w_angle8(float a);
+		void w_chunk_close8(u32 position);
+		void w_chunk_open8(u32* position);
+		void w_dir(Fvector* D);
+		void w_fp32(float* v);
+		void w_fp32_q16(float a, float min, float max);
+		void w_fp32_q8(float a, float min, float max);
+		void w_matrix(Fmatrix M);
+		void w_matrix_43T(Fmatrix43 M);
+	};
+	class UCORE_API iwriter : public writer_base_t
+	{
+
+	};
 }

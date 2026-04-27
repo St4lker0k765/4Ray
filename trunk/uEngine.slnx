@@ -1,5 +1,6 @@
 <Solution>
   <Configurations>
+    <Platform Name="Any CPU" />
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
@@ -8,6 +9,9 @@
       <BuildDependency Project="3rd-party/zlib/zlib.vcxproj" />
     </Project>
     <Project Path="3rd-party/zlib/zlib.vcxproj" Id="ca2604ca-a2ac-49a1-a468-8ab5a2e6cbc9" />
+  </Folder>
+  <Folder Name="/SDK/">
+    <Project Path="SDK/Agent/Agent.csproj" Id="cad0d1a7-e561-494f-a61e-45353ead4a73" />
   </Folder>
   <Project Path="uCore/uCore.vcxproj" Id="94096a73-a541-4c1b-b4fd-9e22d73a2dab" />
   <Project Path="uEngine/uEngine.vcxproj" Id="7c9bca6f-e0e6-4f83-9faa-7b946d0aef77" />
