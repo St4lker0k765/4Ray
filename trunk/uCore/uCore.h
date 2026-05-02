@@ -9,6 +9,7 @@
 #include "libtypes.h"
 #include "threading.h"
 #include "gtl/intrusive_ptr.h"
+#include "libtimer.h"
 
 #ifdef UCORE_EXPORTS
 #define UCORE_API __declspec(dllexport)

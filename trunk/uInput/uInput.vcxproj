@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -141,12 +141,14 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="input_manager.cpp" />
+    <ClCompile Include="input_manager_actions.cpp" />
     <ClCompile Include="input_manager_pc.cpp" />
     <ClCompile Include="input_manager_xbox.cpp" />
     <ClCompile Include="u_input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="input_manager.h" />
+    <ClInclude Include="input_manager_pc.h" />
     <ClInclude Include="input_manager_xbox.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="u_input.h" />
