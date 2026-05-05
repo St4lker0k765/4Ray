@@ -54,6 +54,10 @@ public:
 	}
 };
 
+typedef _vec4<float>		Fvector;
+typedef _vec4<double>	Dvector;
+typedef _vec4<s32>		Ivector;
+
 typedef							_vec4<float>		Fvector4;
 typedef							_vec4<double>	Dvector4;
 typedef							_vec4<s32>		Ivector4;

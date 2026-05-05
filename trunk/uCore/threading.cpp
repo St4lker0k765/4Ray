@@ -69,6 +69,36 @@ void threading::spin_lock::unlock()
 	_lock = 0;
 }
 
+threading::semaphore::semaphore()
+{
+	_os = CreateSemaphoreA(nullptr, 0, INT_MAX, nullptr);
+}
+
+threading::semaphore::~semaphore()
+{
+	CloseHandle(_os);
+}
+
+bool threading::semaphore::signal()
+{
+	return ReleaseSemaphore(_os, 1, nullptr);
+}
+
+bool threading::semaphore::signal(long cnt)
+{
+	return ReleaseSemaphore(_os, cnt, nullptr);
+}
+
+bool threading::semaphore::wait()
+{
+	return WaitForSingleObject(_os, INT_MAX) == 0;
+}
+
+bool threading::semaphore::trywait(u32 multiply)
+{
+	return WaitForSingleObject(_os, 0) == 0;
+}
+
 void threading::_initialize_fpu()
 {
 	platform.fpu_set24r();
@@ -80,4 +110,62 @@ void threading::_initialize_fpu()
 void threading::_initialize_cpu_thread()
 {
 	threading::_initialize_fpu();
+}
+
+threading::tls::~tls()
+{
+	if (_index != -1)
+		TlsFree(_index);
+}
+
+void threading::tls::deinit()
+{
+	if (_index != -1)
+		TlsFree(_index);
+}
+
+bool threading::tls::valid()
+{
+	return _index != -1;
+}
+
+void* threading::tls::value()
+{
+	return TlsGetValue(_index);
+}
+
+void threading::taskpool::worker(void* __formal)
+{	
+	fastdelegate::FastDelegate<void*()> e; // [rsp+20h] [rbp-18h] BYREF
+
+	do
+	{
+		_InterlockedIncrement(&num_waiters);
+		tasks.wait();
+		_InterlockedDecrement(&num_waiters);
+		do
+		{
+			threading::taskpool::execute_all_nrm(this);
+			while (!(this->queue_n.counter + this->queue_r.counter))
+			{
+				e.m_Closure.m_pthis = nullptr;
+				e.m_Closure.m_pFunction = nullptr;
+				access_s.lock();
+				if (!queue_s.read(&e))
+				{
+					access_s.unlock();
+					break;
+				}
+				access_s.unlock();
+				if (e.m_Closure.m_pthis || e.m_Closure.m_pFunction)
+					((void (*)(void))e.m_Closure.m_pFunction)();
+			}
+		} while (this->queue_n.counter + this->queue_r.counter);
+	} while (!exit_flag);
+	_InterlockedIncrement(&exit_counter);
+}
+
+volatile int threading::taskpool::workinprogress()
+{
+	return inprogress;
 }

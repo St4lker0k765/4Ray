@@ -424,11 +424,8 @@ public:
 		}
 	}
 };
-typedef _vec3<float>		Fvector;
-typedef _vec3<float>		Fvector3;
-typedef _vec3<double>	Dvector;
+typedef _vec3<float>	Fvector3;
 typedef _vec3<double>	Dvector3;
-typedef _vec3<s32>		Ivector;
 typedef _vec3<s32>		Ivector3;
 
 template <class T>

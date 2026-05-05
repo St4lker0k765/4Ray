@@ -107,7 +107,7 @@ namespace vfs
 		void w_angle8(float a);
 		void w_chunk_close8(u32 position);
 		void w_chunk_open8(u32* position);
-		void w_dir(Fvector* D);
+		void w_dir(Fvector3* D);
 		void w_fp32(float* v);
 		void w_fp32_q16(float a, float min, float max);
 		void w_fp32_q8(float a, float min, float max);

@@ -23,7 +23,7 @@ struct circular_buffer
         if (!counter)
             return 0;
 
-        char* v8 = &buffer->data.storage[216 * readptr];
+        char* v8 = &buffer->data.storage[sizeof(T) * readptr];
         if (((e | v8) & 0xF) != 0)
         {
             memcpy(e, v8, sizeof(T));
@@ -53,7 +53,7 @@ struct circular_buffer
             *(_OWORD*)&e->addr[5] = *((_OWORD*)v8 + 4);
             e->addr[7] = *((_QWORD*)v8 + 10);
         }
-        readptr = (readptr + 1) & 0x1FF;
+        readptr = (readptr + 1) & (1 << shift);
         --counter;
         return 1;
     }

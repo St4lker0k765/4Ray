@@ -43,11 +43,11 @@ void u_core::_destroy(UINT res)
 {
     if (init_counter-- == 1)
     {
-        str_shared result; // [rsp+50h] [rbp+18h] BYREF
+        str_shared result;
         log_flush(&result);
         if (vfs::registry_exists())
         {
-            delete vfs::registry();
+        //    delete vfs::registry();
         }
     }
     vfs::trace.end();

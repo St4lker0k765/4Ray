@@ -211,7 +211,6 @@
     <ClInclude Include="progress_item.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threading.h" />
-    <ClInclude Include="threading_rw_check.h" />
     <ClInclude Include="libtimer.h" />
     <ClInclude Include="tlsf.h" />
     <ClInclude Include="uCore.h" />

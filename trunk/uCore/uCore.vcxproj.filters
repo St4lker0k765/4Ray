@@ -194,9 +194,6 @@
     <ClInclude Include="threading.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="threading_rw_check.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="u_string.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
