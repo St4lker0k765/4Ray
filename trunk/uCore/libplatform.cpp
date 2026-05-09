@@ -43,12 +43,6 @@ void u_platform::initialize_begin()
 
 void u_platform::initialize_end()
 {
-	double v15; // xmm2_8
-	float v16; // xmm0_4
-	float v17; // xmm0_4
-	double v21; // xmm6_8
-	float v22; // xmm0_4
-
 	SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 	for (DWORD i = timeGetTime(); i - temp_start_timer < 1000; i = timeGetTime())
 	{
@@ -58,7 +52,7 @@ void u_platform::initialize_end()
 
 	cycles.overhead = 0;
 	cycles.per_second = 1000 * (get_clocks() - temp_start_clk) / (timeGetTime() - temp_start_timer);
-	u64 overhead; // r8
+	u64 overhead;
 	for (u64 i = 64; i > 0; i--)
 	{
 		overhead = ((get_clocks() << 32) | get_clocks()) + cycles.overhead - get_clocks();
@@ -72,33 +66,30 @@ void u_platform::initialize_end()
 
 	cycles.per_second -= cycles.overhead;
 	u64 per_second = cycles.per_second;
-	double v14 = per_second;
 	cycles.per_milisec = per_second / 1000;
 	cycles.per_microsec = per_second / 1000 / 1000;
 
-	if ((per_second & 0x8000000000000000uLL) != 0LL)
-		v14 = v14 + 1.844674407370955e19;
-	v15 = 1.0 / v14;
-	v16 = 1.0 / v14;
-	cycles.to_seconds = v16;
-	v17 = v15 * 1000.0;
-	cycles.to_milisec = v17;
-	cycles.to_microsec = v15 * 1000000.0;
+	if (per_second < 0)
+		per_second = -per_second;
+
+	cycles.to_seconds = 1.0 / per_second;
+	cycles.to_milisec = 1.0 / per_second * 1000.0;
+	cycles.to_microsec = cycles.to_seconds * 1000000.0;
 
 	u64 qwTimeFreq;
 	QueryPerformanceFrequency((PLARGE_INTEGER)&qwTimeFreq);
 	qpc.overhead = 0;
 	qpc.per_second = qwTimeFreq;
-	double v20 = qwTimeFreq;
 	qpc.per_milisec = qwTimeFreq / 1000;
 	qpc.per_microsec = qwTimeFreq / 1000000;
 	if (qwTimeFreq < 0)
-		v20 = v20 + 1.844674407370955e19;
-	v21 = 1.0 / v20;
-	qpc.to_seconds = 1.0 / v20;
-	qpc.to_milisec = v21 * 1000.0;
-	qpc.to_microsec = v21 * 1000000.0;
-	u_platform::fpu_set24r();
+		qwTimeFreq = -qwTimeFreq;
+
+	qpc.to_seconds = 1.0 / qwTimeFreq;
+
+	qpc.to_milisec = qpc.to_seconds * 1000.0;
+	qpc.to_microsec = qpc.to_seconds * 1000000.0;
+	fpu_set24r();
 }
 
 void u_platform::fpu_set24r()

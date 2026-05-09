@@ -117,7 +117,7 @@ void vfs::reader_base::r_dir(Fvector3* A)
 {
     u16 t = r_u16();
     Fvector3 r;
-    Fvector3 d = compression::decompress::normal(&r, &t);
+    Fvector3 d = compression::decompress::normal(r, t);
 
     A->x = d.x;
     A->z = d.z;
