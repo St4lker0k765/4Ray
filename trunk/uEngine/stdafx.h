@@ -3,9 +3,12 @@
 #include "../uInput/stdafx.h"
 
 #ifdef UENGINE_EXPORTS
-#define UENGINE_API __declspec(dllexport)
+#define ENGINE_API __declspec(dllexport)
+#define DLL_API __declspec(dllimport)
 #else
-#define UENGINE_API __declspec(dllimport)
+#define ENGINE_API __declspec(dllimport)
+#define DLL_API __declspec(dllexport)
 #endif
 
+#include "defines.h"
 #include "engine.h"

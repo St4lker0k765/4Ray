@@ -76,7 +76,7 @@ namespace vfs
 		bool chunk_try_open_at_current_position(u32 ID, ireader* result);
 	};
 
-	class writer_base_t
+	class UCORE_API iwriter
 	{
 	protected:
 		u_stack<u32> chunk_pos{};
@@ -84,38 +84,123 @@ namespace vfs
 	public:
 		void chunk_close();
 		void chunk_open(u32 type);
-		u64 chunk_size();
+		u32 chunk_size();
 		void chunk_write(u32 type, void* data, u32 size);
-		str_shared file_name();
-		void seek(u32 pos);
-		u32 tell();
-		bool valid();
+		inline str_shared file_name() { return f_name; }
+		virtual void seek(u32 pos) = 0;
+		virtual void space() {}
+		virtual u32 tell() = 0;
+		virtual bool valid() = 0;
 
-		void w(const void* ptr, u64 count);
-		void w1(const void* ptr);
-		void w12(const void* ptr);
-		void w12_4(s32 v0, s32 v1, s32 v2);
-		void w16(const void* ptr);
-		void w16_4(const void* ptr);
-		void w2(const void* ptr);
-		void w4(const void* ptr);
-		void w4_4(s32 v);
-		void w8(const void* ptr);
-		void w8_4(s32 v0, s32 v1);
+		virtual void w(const void* ptr, u64 count) = 0;
+		inline void w1(const void* ptr) { w(ptr, 1); }
+		inline void w12(const void* ptr) { w(ptr, 12); }
+		inline void w12_4(s32 v0, s32 v1, s32 v2)
+		{
+			w(&v0, sizeof(v0));
+			w(&v1, sizeof(v1));
+			w(&v2, sizeof(v2));
+		}
+		inline void w16(const void* ptr) { w(ptr, 16); }
+		inline void w12_4(s32 v0, s32 v1, s32 v2, s32 v3)
+		{
+			w(&v0, sizeof(v0)); 
+			w(&v1, sizeof(v1));
+			w(&v2, sizeof(v2));
+			w(&v3, sizeof(v3));
+		}
+		inline void w2(const void* ptr) { w(ptr, 2); }
+		inline void w4(const void* ptr) { w(ptr, 4); }
+		inline void w4_4(s32 v) { w(&v, sizeof(v)); }
+		inline void w8(const void* ptr) { w(ptr, 8); }
+		inline void w8_4(s32 v0, s32 v1) 
+		{ 
+			w(&v0, sizeof(v0));
+			w(&v1, sizeof(v1));
+		}
+		inline void w_printf(const char* format, ...)
+		{
+			string1024 buf;
+			va_list va;
+			va_start(va, format);
+			vsprintf(buf, format, va);
+			w(buf, strlen(buf));
+		}
 
-		void w_angle16(float a);
-		void w_angle8(float a);
+		inline void w_angle16(float a) { w_fp32_q16(angle_normalize(a), 0, PI_MUL_2); }
+		inline void w_angle8(float a) { w_fp32_q8(angle_normalize(a), 0, PI_MUL_2); }
 		void w_chunk_close8(u32 position);
 		void w_chunk_open8(u32* position);
-		void w_dir(Fvector3* D);
-		void w_fp32(float* v);
-		void w_fp32_q16(float a, float min, float max);
-		void w_fp32_q8(float a, float min, float max);
-		void w_matrix(Fmatrix M);
-		void w_matrix_43T(Fmatrix43 M);
-	};
-	class UCORE_API iwriter : public writer_base_t
-	{
+		inline void w_dir(Fvector3 D) { w_u16(compression::compress::normal(D)); }
+		inline void w_fp32(float v) { w(&v, sizeof(v)); }
+		inline void w_fp32_q16(float a, float min, float max)
+		{
+			VERIFY2(a >= min && a <= max, make_string("incorrect values for quantize [%f] <= [%f] <= [%f]", min, a, max));
+			float q = (a - min) / (max - min);
+			w_u16(u16(iFloor(q * 65535.f + .5f)));
+		}
+		inline void w_fp32_q8(float a, float min, float max)
+		{
+			VERIFY2(a >= min && a <= max, make_string("incorrect values for quantize [%f] <= [%f] <= [%f]", min, a, max));
+			float q = (a - min) / (max - min);
+			w_u8(u8(iFloor(q * 255.f + .5f)));
+		}
+		inline void w_matrix(Fmatrix M) { w(&M, sizeof(M)); }
+		inline void w_matrix_43T(Fmatrix43 M) { w(&M, sizeof(M)); }
+		void w_racc(u32 pos, const void* p, u32 count);
+		
+		inline void w_s16(s16 v) { w(&v, sizeof(v)); }
+		inline void w_s32(s32 v) { w(&v, sizeof(v)); }
+		inline void w_s64(s64 v) { w(&v, sizeof(v)); }
+		inline void w_s8(s8 v) { w(&v, sizeof(v)); }
 
+		inline void w_string(const char* p) { w(p,strlen(p));w_u8(13);w_u8(10); }
+		void w_stringz(const char* p) { w(p,strlen(p)+1); }
+		void w_stringz(str_shared& p) { w(*p?*p:"",p.size());w_u8(0); }
+		void w_stringz(u_string& p) { w(p.c_str()?p.c_str():"",p.size());w_u8(0); }
+
+		inline void w_u16(u16 v) { w(&v, sizeof(v)); }
+		inline void w_u32(u32 v) { w(&v, sizeof(v)); }
+		inline void w_u64(u64 v) { w(&v, sizeof(v)); }
+		inline void w_u8(u8 v) { w(&v, sizeof(v)); }
+
+		inline void w_vec2f(Fvector2 v) 
+		{ 
+			w_fp32(v.x);
+			w_fp32(v.y);
+		}
+		inline void w_vec2i(Ivector2 v)
+		{
+			w_s32(v.x);
+			w_s32(v.y);
+		}
+
+		inline void w_vec3f(Fvector3 v)
+		{ 
+			w_fp32(v.x);
+			w_fp32(v.y);
+			w_fp32(v.z);
+		}
+		inline void w_vec3i(Ivector3 v) 
+		{
+			w_s32(v.x);
+			w_s32(v.y);
+			w_s32(v.z);
+		}
+
+		inline void w_vec4f(Fvector4 v) 
+		{
+			w_fp32(v.x);
+			w_fp32(v.y);
+			w_fp32(v.z);
+			w_fp32(v.w);
+		}
+		inline void w_vec4i(Ivector4 v) 
+		{
+			w_s32(v.x);
+			w_s32(v.y);
+			w_s32(v.z);
+			w_s32(v.w);
+		}
 	};
 }

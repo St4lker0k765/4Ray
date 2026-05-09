@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-// string(char)
 class u_string : public	std::basic_string<char, std::char_traits<char>, u_alloc<char> >
 {
 private:

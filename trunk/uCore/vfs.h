@@ -71,9 +71,9 @@ namespace vfs
 	void mark(const char* name) {}
 	u64 package_version();
 	void path_build_os(char* path);
-	void rbuffered(const char* fn, const fastdelegate::FastDelegate<bool (void*&, u64)>* cb);
-	void rbuffered_os(const char* fn, const fastdelegate::FastDelegate<bool (void*&, u64)>* cb);
-	void rbuffered_package(vfs::package_registry* package, const char* fn, const fastdelegate::FastDelegate<bool(void*&, u64)>* cb, const int force_raw);
+	void rbuffered(const char* fn, const fastdelegate::FastDelegate<bool (void*, u64)>* cb);
+	void rbuffered_os(const char* fn, const fastdelegate::FastDelegate<bool (void*, u64)>* cb);
+	void rbuffered_package(vfs::package_registry* package, const char* fn, const fastdelegate::FastDelegate<bool(void*, u64)>* cb, const int force_raw);
 	void registry();
 	bool registry_exists();
 	vfs::ireader ropen(vfs::ireader result, const char* fn);

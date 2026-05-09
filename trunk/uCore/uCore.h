@@ -18,6 +18,7 @@
 #endif
 
 #include "debug.h"
+#include "libstr.h"
 #include "libmath.h"
 #include "librandom.h"
 #include "libvec2.h"

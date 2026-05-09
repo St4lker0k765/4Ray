@@ -132,14 +132,17 @@
     <ClCompile Include="engine_camera.cpp" />
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="stable.cpp" />
     <ClCompile Include="u_splash_window.cpp" />
     <ClCompile Include="u_window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="defines.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="engine_camera.h" />
     <ClInclude Include="locale.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="stable.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="u_splash_window.h" />
     <ClInclude Include="u_window.h" />

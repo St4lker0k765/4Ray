@@ -504,3 +504,61 @@ bool vfs::ireader::chunk_try_open_at_current_position(u32 ID, vfs::ireader* resu
     result->__iterpos = __pos + sz;
     return true;
 }
+
+void vfs::iwriter::chunk_open(u32 type)
+{
+    w_u32(type);
+    chunk_pos.push(tell());
+    w_u32(0);	// the place for 'size'
+}
+
+void vfs::iwriter::chunk_close()
+{
+    VERIFY(!chunk_pos.empty());
+
+    int pos = tell();
+    seek(chunk_pos.top());
+    w_u32(pos - chunk_pos.top() - 4);
+    seek(pos);
+    chunk_pos.pop();
+}
+
+u32	vfs::iwriter::chunk_size()					// returns size of currently opened chunk, 0 otherwise
+{
+    if (chunk_pos.empty())
+        return 0;
+
+    return tell() - chunk_pos.top() - 4;
+}
+
+void vfs::iwriter::chunk_write(u32 type, void* data, u32 size)
+{
+    chunk_open(type);
+    w(data, size);
+    chunk_close();
+}
+
+void vfs::iwriter::w_chunk_close8(u32 position)
+{
+    u32 size = chunk_pos.size() - position - 1;
+    R_ASSERT(size<256);
+
+    int pos = tell();
+    seek(position);
+    w_s8(size);
+    seek(pos);
+}
+
+void vfs::iwriter::w_chunk_open8(u32* position)
+{
+    *position = tell();
+    w_u8(0); // the place for 'size'
+}
+
+void vfs::iwriter::w_racc(u32 pos, const void* p, u32 count)
+{
+    u32 _pos = tell();
+    seek(pos);
+    w(p, count);
+    seek(_pos);
+}

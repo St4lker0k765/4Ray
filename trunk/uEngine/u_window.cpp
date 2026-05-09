@@ -149,17 +149,15 @@ LRESULT wnd_proc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
         case 0x16u:
             if (l_param == 1)
             {
-                uconsole::server* v11 = console((threading*)h_wnd);
-                v11->execute_deferred("quit");
+                console->execute_deferred("quit");
                 return 0;
             }
             return DefWindowProcA(h_wnd, u_msg, w_param, l_param);
         case WM_ACTIVATE:
-            bool v9 = (_WORD)w_param && !WORD1(w_param);
-            if (engine.window._b_active != v9)
+            if (engine.window._b_active != w_param)
             {
-                engine.on_window_activate(v9);
-                if (!engine.window._b_windowed && !v9)
+                engine.on_window_activate(w_param);
+                if (!engine.window._b_windowed && !w_param)
                     ShowWindow(engine.window.m_hwnd, 6);
             }
             break;
@@ -178,7 +176,7 @@ LRESULT wnd_proc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
     case WM_ACTIVATEAPP:
         if (engine.window._b_active != (w_param != 0))
         {
-            cengine::on_window_activate(&engine, w_param != 0);
+            engine.on_window_activate(w_param != 0);
             if (!engine.window._b_windowed && !w_param)
                 ShowWindow(engine.window.m_hwnd, 6);
         }

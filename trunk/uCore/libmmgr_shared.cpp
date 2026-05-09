@@ -247,3 +247,11 @@ smem_container::smem_container(const smem_container* other)
 	_os = other->_os;
 	buckets = other->buckets;
 }
+
+str_value* str_shared::crc()
+{
+	if (p_)
+		return (str_value*)p_->crc;
+
+	return p_;
+}

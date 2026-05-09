@@ -19,6 +19,19 @@ public:
 	void fail(const char* e1, const char* e2, const char* e3, const char* e4, const char* e5, const char* e6, const char* file, const char* func, int line);
 };
 
+// warning
+// this function can be used for debug purposes only
+inline std::string __cdecl	make_string(LPCSTR format, ...)
+{
+	va_list		args;
+	va_start(args, format);
+
+	char		temp[4096];
+	vsprintf(temp, format, args);
+
+	return		(temp);
+}
+
 extern UCORE_API debug Debug;
 
 #define DEBUG_INFO					__FILE__,__FUNCTION__,__LINE__

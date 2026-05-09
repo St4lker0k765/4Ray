@@ -11,6 +11,29 @@ bool already_running()
     return exists;
 }
 
+HHOOK g_keyboard_hook;
+LRESULT ll_keyboard_proc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode)
+        return CallNextHookEx(g_keyboard_hook, nCode, wParam, lParam);
+
+    if ((wParam == WPARAM(-1)) || engine.window._b_windowed || !engine.window._b_active)
+        return CallNextHookEx(g_keyboard_hook, 0, wParam, lParam);
+
+    return true;
+}
+
+HHOOK hook_keyboard()
+{
+    HMODULE ModuleHandleA; // rax
+    HHOOK result; // rax
+
+    ModuleHandleA = GetModuleHandleA(0);
+    result = SetWindowsHookExA(WH_KEYBOARD_LL, ll_keyboard_proc, ModuleHandleA, 0);
+    g_keyboard_hook = result;
+    return result;
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lp_cmd_line, int n_cmd_show)
 {
     char* ptr; // rax

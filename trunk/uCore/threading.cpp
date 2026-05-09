@@ -136,20 +136,17 @@ void* threading::tls::value()
 
 void threading::taskpool::worker(void* __formal)
 {	
-	fastdelegate::FastDelegate<void*()> e; // [rsp+20h] [rbp-18h] BYREF
-
-	do
+	while (!exit_flag)
 	{
 		_InterlockedIncrement(&num_waiters);
 		tasks.wait();
 		_InterlockedDecrement(&num_waiters);
 		do
 		{
-			threading::taskpool::execute_all_nrm(this);
-			while (!(this->queue_n.counter + this->queue_r.counter))
+			execute_all_nrm();
+			while (!(queue_n.counter + queue_r.counter))
 			{
-				e.m_Closure.m_pthis = nullptr;
-				e.m_Closure.m_pFunction = nullptr;
+				fastdelegate::FastDelegate<void*()> e;
 				access_s.lock();
 				if (!queue_s.read(&e))
 				{
@@ -157,11 +154,11 @@ void threading::taskpool::worker(void* __formal)
 					break;
 				}
 				access_s.unlock();
-				if (e.m_Closure.m_pthis || e.m_Closure.m_pFunction)
-					((void (*)(void))e.m_Closure.m_pFunction)();
+				if (e)
+					e();
 			}
-		} while (this->queue_n.counter + this->queue_r.counter);
-	} while (!exit_flag);
+		} while (queue_n.counter + queue_r.counter);
+	}
 	_InterlockedIncrement(&exit_counter);
 }
 

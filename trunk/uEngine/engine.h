@@ -1,8 +1,20 @@
 #pragma once
 #include "locale.h"
 #include "u_window.h"
+#include "stable.h"
 
-class cengine
+class iconstructable
+{
+	virtual void _destruct() {}
+};
+
+// Class creation/destroying interface
+extern "C" {
+typedef DLL_API  iconstructable*	  __cdecl Factory_Create	(str_shared clsid, str_shared static_data_key);
+typedef DLL_API  void		  __cdecl Factory_Destroy	(iconstructable* O);
+};
+
+class ENGINE_API cengine
 {
 protected:
 	HINSTANCE h_game;
@@ -13,9 +25,8 @@ protected:
 	HINSTANCE h_skeleton;
 	HINSTANCE h_vtune;
 
-	// TODO: do these callbacks
-	// p_create
-	// p_destroy
+	Factory_Create* p_create;
+	Factory_Destroy* p_destroy;
 
 	editor_interface* p_editor;
 	enum espawn_save : u8
@@ -132,7 +143,22 @@ protected:
 	u_vector<u_string> _error_messages;
 	threading::spin_lock _error_messages_lock;
 public:
+	cengine();
+	~cengine();
+
+	void append_error_message(const char* msg);
+	void check_language_change();
+	void core_downloaded_thread(void* __formal);
+
+	void create();
+	void destroy();
+
+	bool do_not_play_video();
+	e_edit_mode edit_mode();
+
+	void hide_message(str_shared key);
+
 
 };
 
-extern UENGINE_API cengine engine;
+extern ENGINE_API cengine engine;
