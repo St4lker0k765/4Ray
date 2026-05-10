@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <malloc.h>
+#include <types>
 #include <typeinfo>
 #include "fastdelegate.h"
 #include "libtypes.h"

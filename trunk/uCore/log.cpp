@@ -25,10 +25,7 @@ void log_create(bool no_log)
         }
         else
         {
-            strcpy_s(log_fname, sizeof(log_fname), core.application_name.c_str());
-            strcat_s(log_fname, sizeof(log_fname), "_");
-            strcat_s(log_fname, sizeof(log_fname), core.user_name.c_str());
-            strcat_s(log_fname, sizeof(log_fname), ".log");
+            sz_concat(log_fname, sizeof(log_fname), core.application_name.c_str(), "_", core.user_name.c_str(), ".log");
         }
         Log->fname = log_fname;
     }
@@ -112,7 +109,7 @@ u32 build_number()
 	string16 month;
 
 	string256 buffer;
-	strcpy_s(buffer, sizeof(buffer), __DATE__);
+	sz_cpy(buffer, sizeof(buffer), __DATE__);
 
 	sscanf(buffer, "%s %d %d", month, &days, &years);
 
@@ -172,8 +169,6 @@ void logger::add(const char* split)
 
 void logger::flush_to_hdd()
 {
-    intrusive_ptr<vfs::iwriter, intrusive_base> f; // [rsp+60h] [rbp+8h] BYREF
-
     if (fname.size())
     {
         if (!flush_forced)
@@ -181,13 +176,15 @@ void logger::flush_to_hdd()
             rlog("log flushed to [%s]", fname.c_str());
             rlog("%s build %d[SVN=%s], %s, %s\n", "uCore :: 4A platform", build_number(), core.game_version.c_str(), __DATE__, __TIME__);
         }
+
         lock();
-        vfs::wopen_os(&f, fname.c_str());
-        if (f.get())
+        vfs::iwriter* f;
+        vfs::wopen_os(f, fname.c_str());
+        if (f)
         {
             for (int i = 0; i < strings.size(); i++)
             {
-                vfs::writer_base_t<vfs::iwriter>::w_string(&f.get()->vfs::writer_base_t<vfs::iwriter>, strings[i].c_str());
+                f->w_string(strings[i].c_str());
             }
         }
         unlock();

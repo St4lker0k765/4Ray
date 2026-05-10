@@ -20,24 +20,21 @@ u64 vfs::exist_os_path(const char* path, const int file, u32* size)
 
 void vfs::add_extension(char** dst, string1024* exts, const char* info, char* ext)
 {
-    rsize_t v11 = strlen(ext) + 4 + strlen(info);
+    rsize_t sz = sz_len(ext) + 4 + sz_len(info);
 
-    strcpy_s(*dst, v11, info);
-    strcat_s(*dst, v11, " (");
-    strcat_s(*dst, v11, ext);
-    strcat_s(*dst, v11, ")");
+    sz_concat(*dst, sz, info, " (", ext, ")");
 
     if (exts)
     {
         LPCSTR any = "*.*";
-        for (int i = 0; i < strlen(any); i++)
+        for (int i = 0; i < sz_len(any); i++)
         {
             if (strcmp(ext, "*.*"))
                 break;
         }
-        if (strlen(*exts))
-             strcat_s((char*)exts, sizeof(exts), ";");
-        strcat_s((char*)exts, sizeof(exts), ext);
+        if (sz_len(*exts))
+             sz_cat((char*)exts, sizeof(exts), ";");
+        sz_cat((char*)exts, sizeof(exts), ext);
     }
 }
 
@@ -76,30 +73,10 @@ const char* vfs::make_filter(string1024* dest, const char* info, char* ext)
             v3[v7 - 1] = v8;
         } while (v8);
         vfs::add_extension(dst, &exts, info, buf);
-        if (strlen(exts))
+        if (sz_len(exts))
             vfs::add_extension(dst, nullptr, "All Formats", exts);
     }
     return *dest;
-}
-
-u64 sz_item_count(const char* src, char separator)
-{
-    u32 v2 = 0;
-    const char* v3 = src;
-
-    if (!src || !strlen(src))
-        return 0;
-
-    for (const char* i = strchr(src, separator); i; i = strchr(i + 1, separator))
-    {
-        v3 = i + 1;
-        ++v2;
-    }
-    u64 result = v2 + 1;
-    if (!strlen(v3))
-        return v2;
-
-    return result;
 }
 
 u64 vfs::get_open_filename(

@@ -36,13 +36,7 @@ HHOOK hook_keyboard()
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lp_cmd_line, int n_cmd_show)
 {
-    char* ptr; // rax
-    char* v11; // rbx
-    const struct str_shared* v13; // rax
-    str_shared Data; // [rsp+58h] [rbp-A8h] BYREF
-    char v28; // [rsp+70h] [rbp-90h] BYREF
-
-    cengine::loader_log(&engine, "WinMain");
+    engine.loader_log("WinMain");
     engine_timing::engine_started(&engine.time);
     if (!IsDebuggerPresent())
         hook_keyboard();
@@ -58,21 +52,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lp_cmd_
         _chdrive(21); // drive U:
         _chdir("\\");
     }
-    ptr = core.application_name.ptr;
     g_editor = strstr(GetCommandLineA(), "-editor");
     if (!g_editor && core.params())
     {
-        v28 = 0;
-        v11 = strstr(core.params(), "-trace ");
-
-        _BYTE v29[271]; // [rsp+71h] [rbp-8Fh] BYREF
-        memset(v29, 0, 0x103u);
-        sscanf(v11 + 7, "%[^ ] ", &v28);
-        strlwr(v28);
-        v13 = (const struct str_shared*)str_shared::str_shared(&Data, &v28, 0);
-        vfs::tracer::output_dir((vfs::tracer*)vfs::trace._types[0].p_, v13);
-        str_shared::~str_shared(&Data);
-        ptr = core.application_name.ptr;
+        char* dir = 0;
+        sscanf(strstr(core.params(), "-trace ") + 7, "%[^ ] ", &dir);
+        strlwr(dir);
+        vfs::trace.output_dir(dir);
     }
     if (strstr(core.params(), "-branch_trace "))
         g_trace = true;

@@ -85,7 +85,7 @@ void u_core::_initialize(LPCSTR _application_name, LPCSTR _data_path, bool no_lo
     if (!init_counter)
     {
         string256 app_temp;
-        strcpy_s(app_temp, sizeof(app_temp), _application_name);
+        sz_cpy(app_temp, sizeof(app_temp), _application_name);
         _strlwr_s(app_temp, sizeof(app_temp));
         application_name.assign(app_temp, strlen(app_temp));
 
@@ -135,8 +135,8 @@ str_shared u_core::menu_level(str_shared* result)
     {
         string_path Destination;
         R_ASSERT(_build_key.size() && (build_2033() || build_2034()));
-        R_ASSERT(strcpy_s(Destination, sizeof(Destination), _build_key.c_str()));
-        R_ASSERT(strcat_s(Destination, sizeof(Destination), "\\000"));
+        sz_cpy(Destination, sizeof(Destination), _build_key.c_str());
+        sz_cat(Destination, sizeof(Destination), "\\000");
         temp = Destination;
     }
     return temp;
@@ -169,9 +169,9 @@ char* u_core::params()
     if (!params_valid)
     {
         params_string[0] = 0;
-        strcat_s(params_string, sizeof(params_string), " ");
-        strcat_s(params_string, sizeof(params_string), GetCommandLineA());
-        strcat_s(params_string, sizeof(params_string), " ");
+        sz_cat(params_string, sizeof(params_string), " ");
+        sz_cat(params_string, sizeof(params_string), GetCommandLineA());
+        sz_cat(params_string, sizeof(params_string), " ");
 
         trace = strstr(params_string, " -trace ") != 0;
         human_move_ng_mode = strstr(params_string, " -human_move_ng_mode ") != 0;

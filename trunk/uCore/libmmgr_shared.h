@@ -39,7 +39,7 @@ protected:
 	// ref-counting
 	void				_dec() { if (0 == p_) return;	p_->refs--; 	if (0 == p_->refs)	p_ = 0; }
 public:
-	void				_set(str_c rhs) { str_value* v = g_string_container->dock(rhs, default_string); if (0 != v) v->refs++; _dec(); p_ = v; }
+	void				_set(str_c rhs, str_type type = default_string) { str_value* v = g_string_container->dock(rhs, type); if (0 != v) v->refs++; _dec(); p_ = v; }
 	void				_set(str_shared const& rhs) { str_value* v = rhs.p_; if (0 != v) v->refs++; _dec(); p_ = v; }
 	const str_value* _get()	const { return p_; }
 public:

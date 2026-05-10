@@ -1,7 +1,6 @@
 #pragma once
 
 #include "vfs_streams.h"
-typedef intrusive_ptr<vfs::iwriter, intrusive_base>* iwriter_ptr;
 namespace vfs 
 {
 	enum epackage_format
@@ -10,6 +9,37 @@ namespace vfs
 		epackage_format_invalid,
 		epackage_format_lz4,
 		epackage_format_count,
+	};
+	enum resourse_type
+	{
+		rt_file = 0,
+		rt_track,
+		rt_model,
+		rt_mesh,
+		rt_cform,
+		rt_physx,
+		rt_physx_cloth,
+		rt_tex,
+		rt_sound,
+		rt_sound_pf,
+		rt_shader,
+		rt_video,
+		rt_config_bin,
+		rt_fxa,
+		rt_stable,
+		rt_font,
+		rt_cc,
+		rt_motion,
+		rt_system,
+		rt_modifier,
+		rt_effect,
+		rt_music,
+		rt_loc_str,
+		rt_identifier,
+		rt_env,
+		rt_group,
+		rt_count,
+		rt_invalid = u32(-1)
 	};
 	struct db_file
 	{
@@ -32,8 +62,8 @@ namespace vfs
 	u_string append_name_prefix(u_string result, const char* fn);
 	void check_file_name(char* fn);
 	u64 check_package(const char* filename, const void* data, u32 size);
-	void commit_copying(u_vector<str_shared> list);
-	void copy_resource(u32 type, const char* res_name);
+	void commit_copying(u_vector<str_shared>* list);
+	void copy_resource(resourse_type type, const char* res_name);
 	void critical_io_error(const char* path, const char* expr, const char* file, const char* func, int line);
 	void dll_get_func(
 		void* (** func)(void*, u32, u32, u32),
@@ -65,27 +95,27 @@ namespace vfs
 	bool is_term(char a);
 	__time64_t local_time();
 	void log_file(const char* type, const char* name);
-	void log_resource(const str_shared* type, char* name, bool force_trace_allowed, const char* info);
+	void log_resource(const str_shared* type, const char* name, bool force_trace_allowed, const char* info);
 	const char* make_filter(string1024* dest, const char* info, char* ext);
 	void make_path(string_path* path, const char* fn);
 	void mark(const char* name) {}
 	u64 package_version();
-	void path_build_os(char* path);
+	void path_build_os(const char* path);
 	void rbuffered(const char* fn, const fastdelegate::FastDelegate<bool (void*, u64)>* cb);
 	void rbuffered_os(const char* fn, const fastdelegate::FastDelegate<bool (void*, u64)>* cb);
 	void rbuffered_package(vfs::package_registry* package, const char* fn, const fastdelegate::FastDelegate<bool(void*, u64)>* cb, const int force_raw);
 	void registry();
 	bool registry_exists();
-	vfs::ireader ropen(vfs::ireader result, const char* fn);
-	vfs::ireader ropen_os(vfs::ireader result, char* fn);
-	vfs::ireader ropen_package(vfs::ireader result, vfs::package_registry* package, const char* fn, bool force_raw, u32* uncompressed_size);
-	vfs::ireader ropen_raw(vfs::ireader result, char* fn);
+	vfs::ireader* ropen(vfs::ireader* result, const char* fn);
+	vfs::ireader* ropen_os(vfs::ireader* result, char* fn);
+	vfs::ireader* ropen_package(vfs::ireader* result, vfs::package_registry* package, const char* fn, bool force_raw, u32* uncompressed_size);
+	vfs::ireader* ropen_raw(vfs::ireader* result, char* fn);
 	u64 test_package_permanent(const char* fn);
 	__time64_t to_time_t(const _SYSTEMTIME* st);
 	intrusive_base* wopen_ex(intrusive_base* result, const char* fn);
-	iwriter_ptr wopen_os(iwriter_ptr result, const char* fn);
-	iwriter_ptr wopen_os_buf(iwriter_ptr result, const char* fn, u32 buf_size);
-	iwriter_ptr wopen_safe(iwriter_ptr result, const char* fn, const int __formal);
+	vfs::iwriter* wopen_os(vfs::iwriter* result, const char* fn);
+	vfs::iwriter* wopen_os_buf(vfs::iwriter* result, const char* fn, u32 buf_size);
+	vfs::iwriter* wopen_safe(vfs::iwriter* result, const char* fn, const int __formal);
 
 }
 

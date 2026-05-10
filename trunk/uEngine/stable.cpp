@@ -167,27 +167,19 @@ u32 localization::stable::extract_char(const char* text, char* dest, u32 size)
 void localization::stable::load(const char* lng_id, const char* path)
 {
     const char* v4; // rbx
-    str_shared v6; // rax
-    vfs::ireader R; // [rsp+20h] [rbp-148h] BYREF
-    str_shared v9; // [rsp+28h] [rbp-140h] BYREF
-    string_path Destination; // [rsp+30h] [rbp-138h] BYREF
+    vfs::ireader* R; // [rsp+20h] [rbp-148h] BYREF
 
-    v4 = "content\\localization\\";
+    const char* v4 = "content\\localization\\";
     if (path)
         v4 = path;
+
     rlog("begin stable::load(%s)");
-    if (strcpy_s(Destination, sizeof(string_path), v4))
-        debug::fail((debug*)"0==strcpy_s(dest,sz,src)", "d:\\trunk\\src\\ucore\\libstr.h", "sz_cpy", 37);
-    strcat_s(Destination, 0x104u, "stable_");
-    strcat_s(Destination, 0x104u, lng_id);
-    if (strcat_s(Destination, 0x104u, ".lng"))
-        debug::fail((debug*)"0==strcat_s(dest,sz,S1)", "d:\\trunk\\src\\ucore\\libstr.h", "sz_cat", 59);
-    vfs::ropen(&R, Destination);
+    string_path dest; // [rsp+30h] [rbp-138h] BYREF
+    sz_concat(dest, sizeof(dest), v4, "stable_", lng_id, ".lng");
+    vfs::ropen(R, dest);
     if (R)
     {
-        v6 = (str_shared*)str_shared::str_shared(&v9, lng_id, 0);
-        load(&R, v6);
-        str_shared::~str_shared(&v9);
+        load(R, lng_id);
     }
     else
     {
@@ -215,10 +207,8 @@ str_shared localization::stable::translate(str_shared key, bool* exist)
     if (key.size())
     {
         v6 = key.crc() % STABLE_HASH_SIZE;
-        while (_InterlockedCompareExchange(&this->_lock, -1, 0))
-            ;
         v7 = (char*)this + 8 * v6;
-        v8 = (str_shared*)*((_QWORD*)v7 + 5);
+        v8 = (str_shared*)*(v7 + 5);
         p = v8;
         v10 = v8;
         if (v8)
@@ -240,8 +230,6 @@ str_shared localization::stable::translate(str_shared key, bool* exist)
                 *exist = true;
             v4 = p + 1;
         }
-    LABEL_15:
-        this->_lock = 0;
     }
     return v4;
 }

@@ -136,7 +136,7 @@ void u_memory::_dump()
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), 0xFFFFFFFFFFFFFFFFuLL);
     if (debug)
         debug->dump();
 }

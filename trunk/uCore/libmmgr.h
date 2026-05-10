@@ -6,7 +6,7 @@ struct stack_tracer
 	stack_tracer(u64 (*addr)[12]);
 };
 
-class mem_debugger : threading::mutex
+class mem_debugger : public threading::mutex
 {
 protected:
 	struct record
@@ -121,5 +121,178 @@ public:
 	char* xmem_realloc(char* ptr, u64 size, u64 align, const char* _);
 	char* xmem_realloc_aligned(char* ptr, u64 size, const char* _);
 };
-
 extern UCORE_API u_memory* memory();
+
+#ifdef DEBUG_MEMORY_NAME
+// new(0)
+template <class T>
+IC	T* xr_new()
+{
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T();
+}
+// new(1)
+template <class T, class P1>
+IC	T* xr_new(const P1& p1) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1);
+}
+// new(2)
+template <class T, class P1, class P2>
+IC	T* xr_new(const P1& p1, const P2& p2) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2);
+}
+// new(3)
+template <class T, class P1, class P2, class P3>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3);
+}
+// new(4)
+template <class T, class P1, class P2, class P3, class P4>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4);
+}
+// new(5)
+template <class T, class P1, class P2, class P3, class P4, class P5>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4, p5);
+}
+// new(6)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4, p5, p6);
+}
+// new(7)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7);
+}
+// new(8)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7, const P8& p8) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7, p8);
+}
+// new(9)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9>
+IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7, const P8& p8, const P8& p9) {
+	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+}
+#else // DEBUG_MEMORY_NAME
+// new(0)
+template <class T>
+inline T* u_new()
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T();
+}
+// new(1)
+template <class T, class P1>
+inline T* u_new(const P1& p1) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1);
+}
+// new(2)
+template <class T, class P1, class P2>
+inline T* u_new(const P1& p1, const P2& p2) {
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2);
+}
+// new(3)
+template <class T, class P1, class P2, class P3>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3);
+}
+// new(4)
+template <class T, class P1, class P2, class P3, class P4>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4);
+}
+// new(5)
+template <class T, class P1, class P2, class P3, class P4, class P5>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4, p5);
+}
+// new(6)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4, p5, p6);
+}
+// new(7)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7);
+}
+// new(8)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7, const P8& p8) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7, p8);
+}
+// new(9)
+template <class T, class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9>
+inline T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5, const P6& p6, const P7& p7, const P8& p8, const P8& p9) 
+{
+	T* ptr = (T*)memory().main_realloc(T, sizeof(T), 0, "", false);
+	return new (ptr) T(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+}
+#endif // DEBUG_MEMORY_NAME
+
+template <bool _is_pm, typename T>
+struct u_special_free
+{
+	inline void operator()(T*& ptr)
+	{
+		void* _real_ptr = dynamic_cast<void*>(ptr);
+		ptr->~T();
+		memory().main_realloc(0, sizeof(T), 0, "", false);
+	}
+};
+
+template <typename T>
+struct u_special_free<false, T>
+{
+	inline void operator()(T*& ptr)
+	{
+		ptr->~T();
+		memory().main_realloc(0, sizeof(T), 0, "", false);
+	}
+};
+
+template <class T>
+inline void u_delete(T*& ptr)
+{
+	if (ptr)
+	{
+		u_special_free<std::is_polymorphic<T>::value, T>()(ptr);
+		ptr = nullptr;
+	}
+}
+template <class T>
+inline void u_delete(T* const& ptr)
+{
+	if (ptr)
+	{
+		u_special_free<std::is_polymorphic<T>::value, T>()(const_cast<T*&>(ptr));
+		const_cast<T*&>(ptr) = nullptr;
+	}
+}

@@ -58,7 +58,7 @@ void locale::trace(const str_shared key)
     ;
 }
 
-str_shared* locale::value(str_shared result, int ext)
+str_shared locale::value(str_shared result, int ext)
 {
     unsigned int v6; // r8d
     localization::stable* v7; // rbp
@@ -202,7 +202,7 @@ str_shared* locale::value(str_shared result, int ext)
             str_shared::~str_shared(&resulta);
             return result;
         case 5:
-            this->_exist = 1;
+            _exist = true;
             subtitle_manager::translate_number(subtitle_manager::_instance, res, v6 >> 3);
             return result;
         case 6:
@@ -215,7 +215,7 @@ str_shared* locale::value(str_shared result, int ext)
     }
     else
     {
-        str_shared::str_shared(result, (const struct str_shared*)str_shared::empty.p_);
+        res = "";
     }
     return res;
 }
