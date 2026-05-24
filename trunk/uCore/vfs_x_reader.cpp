@@ -100,7 +100,7 @@ bool vfs::x_reader::read(void* dest, u32 size)
         if (_dbg_path.size())
             file_name = _dbg_path.c_str();
 
-        Debug.fatal("!!error reading '%s'", file_name);
+        debug::fatal("!!error reading '%s'", file_name);
     }
     R_ASSERT2(dest, _dbg_path.size() ? _dbg_path.c_str() : "unknown file");
 

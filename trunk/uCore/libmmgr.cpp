@@ -121,7 +121,7 @@ void u_memory::_compact(u32 full_free)
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
 }
 
 void u_memory::_dump()
@@ -136,7 +136,7 @@ void u_memory::_dump()
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
     if (debug)
         debug->dump();
 }
@@ -153,7 +153,7 @@ void u_memory::_dump_prepare()
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
     if (debug)
         debug->dump_prepare();
 }
@@ -181,7 +181,7 @@ void u_memory::_loss()
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
     if (debug)
         debug->loss();
 }
@@ -198,7 +198,7 @@ void u_memory::_state_diff(u32 state_id)
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
     if (debug)
         debug->state_diff(state_id);
 }
@@ -215,7 +215,7 @@ u32 u_memory::_state_pointer()
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
     if (debug)
         return debug->state_pointer();
 
@@ -234,7 +234,7 @@ void u_memory::_stats(bool output_debug_string, bool vm)
     HeapCompact(GetProcessHeap(), 0);
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    SetProcessWorkingSetSize(GetCurrentProcess(),  0xFFFFFFFFFFFFFFFFuLL, 0xFFFFFFFFFFFFFFFFuLL);
+    SetProcessWorkingSetSize(GetCurrentProcess(), type_max(u64), type_max(u64));
 
     u64 load[2];
     load[0] = 0;

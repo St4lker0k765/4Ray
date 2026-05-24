@@ -185,5 +185,3 @@ void debug::fail(
     sprintf_s(reason, sizeof(reason), "*** Assertion failed ***\nExpression: %s\n%s\n%s\n%s\n%s\n%s", e1, e2, e3, e4, e5, e6);
     backend(reason, file, func, line);
 }
-
-UCORE_API debug Debug;

@@ -8,6 +8,13 @@ enum e_edit_mode : int
     em_other
 };
 
+enum e_shapes_draw_mode : int
+{
+    sm_wire = 0,
+    sm_wire_top,
+    sm_solid
+}
+
 ENGINE_API bool g_editor = false;
 ENGINE_API bool g_nopressanykey = false;
 ENGINE_API bool g_diff = false;

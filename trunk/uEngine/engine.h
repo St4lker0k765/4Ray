@@ -153,12 +153,107 @@ public:
 	void create();
 	void destroy();
 
-	bool do_not_play_video();
-	e_edit_mode edit_mode();
+	inline bool do_not_play_video() { return g_benchmark || (!g_editor || p_editor && p_editor->ai_physics()) && _mp || g_editor; }
+	inline e_edit_mode edit_mode() { g_editor ? p_editor->edit_mode() : em_game; }
 
 	void hide_message(str_shared key);
+	void hide_popup(str_shared message);
+	void show_message(urender::font* fnt, float x, float y, float size, u32 color, locale* message, u32 ttl);
+	void show_message(locale* message, u32 ttl);
+	void show_popup(locale* message, bool big, u32 ttl);
 
+	inline float hud_fov() { return (r_base_hud_fov.value * _hud_fov_coef) * _hud_fov_collision; }
+	inline void hud_fov_coef(float v) { R_ASSERT(_valid(v)); _hud_fov_coef = v; }
+	inline float hud_fov_coef() { return _hud_fov_coef; }
+	inline void hud_fov_collision(float v) { R_ASSERT(_valid(v)); _hud_fov_collision = v; }
+	inline float hud_fov_collision() { return _hud_fov_collision; }
+	inline float hud_fov_custom(float hud_fov_collision) { return (r_base_hud_fov.value * _hud_fov_coef) * hud_fov_collision; }
 
+	inline void hud_offset(Fmatrix m) { _hud_offset = m; }
+	inline Fmatrix hud_offset() { return _hud_offset; }
+
+	inline bool ideogram() { return _ideogram; }
+	
+	inline bool is_ai_physics() { return g_editor ? p_editor->ai_physics() : true; }
+	inline bool is_changing_lang() { return _changing_stable; }
+	inline bool is_edit_mode() { return g_editor && p_editor->edit_mode(); }
+	bool is_lang_supported(str_shared l);
+	inline bool is_spawn_save() { return spawn_save; }
+	bool is_very_first_start();
+
+	void lang_text(const char* l, bool force);
+	inline str_shared lang_text() { return _lang_text; }
+	u_vector<language_type_rec> language_types() { return _language_types; }
+
+	bool loader_execute(const char* mname, u32 from_continue, int from_gameload);
+	void loader_execute_QL(const char* sname, void* sdata, int net);
+	void loader_finish();
+	void loader_log(const char* phase);
+	void loader_render_while_loading();
+	void loader_secondary();
+	void loader_secondary_QL();
+	void loader_wait_finish();
+	void loader_wait_start();
+
+	bool mapstate_delayed();
+
+	inline emp_mode mp()
+	{
+		if (!g_editor)
+			return _mp;
+		if (p_editor && p_editor->ai_physics())
+			return _mp;
+
+		return emp_none;
+	}
+	inline bool mp_coop() { return _mp == emp_coop; }
+	inline bool mp_not_coop() { return _mp != emp_coop; }
+	inline bool mp_pure() { return _mp; }
+
+	void on_window_activate(bool active);
+
+	void pause(bool b_on);
+	inline size_t pause_stack_size() { return _pause_stack.size(); }
+	inline bool paused() { return time.bpaused && !time.bforce_notpaused; }
+	void pop_pause(str_shared reason, bool nocrash);
+	void print_pause_stack();
+	void push_pause(str_shared reason);
+
+	void prepare_oa_tests();
+	void process_error_messages();
+
+	inline bool r_editor() { return *r_editor.uconsole::cmd_integer::value && flags_mapstate == mapstate_running && !g_trace; }
+	
+	inline u32 r_force_actor_pos()
+	{
+		return *r_force_actor_pos.uconsole::cmd_integer::value;
+	}
+	
+	void retranslate();
+
+	void run();
+	void run_oa_tests();
+	void run_prepare();
+	void run_primary();
+	void run_secondary();
+	void run_serial();
+	void run_unprepare();
+
+	bool save_config(u_vector<str_shared>* files);
+
+	// WTF?
+	inline bool skip_on_restart() { return false; }
+
+	ui_item* storage_icon();
+	void storage_icon_clear();
+	void storage_icon_draw();
+	void storage_icon_hide();
+	void storage_icon_lock(int add);
+	void storage_icon_show(ui_item* icon, ui_item* bg, u32 ttl, float scale);
+
+	void switch_to_edit_mode();
+
+	inline u_vector<str_shared> text_languages() { return _text_languages; }
 };
 
 extern ENGINE_API cengine engine;

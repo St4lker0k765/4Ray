@@ -71,12 +71,11 @@ char* u_memory::pool_realloc(void* pool, char* p, size_t size, u64 align, const 
     threading::spin_lock current_lock = nullptr;
     for (int i = 0; i < pools.size(); i++)
     {
-        u_memory::poolreg v16 = pools[i];
-        if (v16.pool == pool)
+        if (pools[i].pool == pool)
         {
-            current_size = v16.memsize;
-            current_lock = v16.lock;
-            current_mblock = (u64)v16.memblock;
+            current_size = pools[i].memsize;
+            current_lock = pools[i].lock;
+            current_mblock = (u64)pools[i].memblock;
             break;
         }
     }
@@ -128,7 +127,7 @@ char* u_memory::pool_realloc(void* pool, char* p, size_t size, u64 align, const 
                     return result;
                 }
                 _stats(0, 0);
-                Debug.fatal("! out of memory");
+                debug::fatal("! out of memory");
             }
             if (debug)
             {

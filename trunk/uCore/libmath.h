@@ -34,6 +34,7 @@ const	float		PI_DIV_8	= 0.3926990816987241548078304229099f;
 // Define types and namespaces (CPU & FPU)
 #include	"libtypes.h"
 #include	"libbitwise.h"
+#include	"libstdext.h"
 
 // comparisions
 inline BOOL  fsimilar		( float		a, float	b, float	cmp=EPS )		{ return abs(a-b)<cmp;	}

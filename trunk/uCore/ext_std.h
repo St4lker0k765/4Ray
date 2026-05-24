@@ -16,20 +16,21 @@ struct circular_buffer
     std::array<T, 1 << shift> buffer;
 
 	bool empty() { return counter == 0; }
-    __int64 read(T* e)
+    bool read(T* e)
     {
-        __int128 v10; // xmm0
+        u64 v10; // xmm0
 
         if (!counter)
-            return 0;
+            return false;
 
-        char* v8 = &buffer->data.storage[sizeof(T) * readptr];
+        char* v8 = &buffer[readptr];
         if (((e | v8) & 0xF) != 0)
         {
             memcpy(e, v8, sizeof(T));
         }
         else
         {
+            memset(e, , sizeof(T));
             u64 v9 = 1;
             do
             {
@@ -56,5 +57,24 @@ struct circular_buffer
         readptr = (readptr + 1) & (1 << shift);
         --counter;
         return 1;
+    }
+    bool write_head(
+        const fastdelegate::FastDelegate<void __cdecl(void)>* e)
+    {
+        u_sarray<fastdelegate::FastDelegate<void __cdecl(void)>, 4096>* p_buffer; // rbp
+        unsigned int v6; // edi
+        threading_rw_check* v7; // rbx
+        T** v8; // rdi
+
+        if (this->counter == 4096)
+            return false;
+
+        v6 = ((unsigned __int16)this->readptr - 1) & 0xFFF;
+        readptr = v6;
+        v8 = (T**)((char*)buffer + 16 * v6);
+        v8[1] = (fastdelegate::detail::GenericClass*)e->m_Closure.m_pFunction;
+        *v8 = e->m_Closure.m_pthis;
+        ++counter;
+        return true;
     }
 };

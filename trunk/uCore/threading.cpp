@@ -133,36 +133,3 @@ void* threading::tls::value()
 {
 	return TlsGetValue(_index);
 }
-
-void threading::taskpool::worker(void* __formal)
-{	
-	while (!exit_flag)
-	{
-		_InterlockedIncrement(&num_waiters);
-		tasks.wait();
-		_InterlockedDecrement(&num_waiters);
-		do
-		{
-			execute_all_nrm();
-			while (!(queue_n.counter + queue_r.counter))
-			{
-				fastdelegate::FastDelegate<void*()> e;
-				access_s.lock();
-				if (!queue_s.read(&e))
-				{
-					access_s.unlock();
-					break;
-				}
-				access_s.unlock();
-				if (e)
-					e();
-			}
-		} while (queue_n.counter + queue_r.counter);
-	}
-	_InterlockedIncrement(&exit_counter);
-}
-
-volatile int threading::taskpool::workinprogress()
-{
-	return inprogress;
-}

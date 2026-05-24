@@ -11,4 +11,5 @@
 #endif
 
 #include "defines.h"
+#include "editor_interface.h"
 #include "engine.h"
