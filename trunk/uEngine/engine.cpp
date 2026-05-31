@@ -27,7 +27,6 @@ T dll_get_func(HMODULE hm, const char* func_name)
 void cengine::create()
 {
     cengine* v1; // r14
-    const char* v2; // rbx
     u_memory* v3; // rax
     streaming::server* v4; // rax
     struct streaming::wi* v5; // r12
@@ -45,7 +44,6 @@ void cengine::create()
     u_archive* v21; // rcx
     char* v22; // rbx
     language_type_rec* v23; // rax
-    uvector_base<8, 8, vector_base<allocator_t<8, 8>, unsigned short> >* p_text_languages; // rsi
     const char* v25; // rax
     const threading_rw_check* v26; // rdx
     const char* v27; // rbx
@@ -89,8 +87,7 @@ void cengine::create()
 
     v1 = this;
     v63 = this;
-    this->_mp = emp_none;
-    v2 = type_info::_name_internal_method((type_info*)&streaming::server `RTTI Type Descriptor', &__type_info_root_node);
+    _mp = emp_none;
         v3 = memory();
     v4 = (streaming::server*)u_memory::main_realloc(v3, 0, 0x1C8u, 8u, v2, 0);
     v5 = 0;
@@ -99,7 +96,7 @@ void cengine::create()
     else
         v6 = 0;
     v55 = 0;
-    g_streamer = v6;
+    g_streamer = u_new<streaming::server*>;
     streaming::server::initialize(v6);
     loader_log("streamer-init");
     string_path postfix; 
@@ -182,9 +179,7 @@ void cengine::create()
     v22 = uvector_base<24, 8, vector_base<allocator_t<24, 8>, unsigned short>>::end(&v1->_language_types);
     v23 = (language_type_rec*)uvector_base<24, 8, vector_base<allocator_t<24, 8>, unsigned short>>::begin(&v1->_language_types);
     _shell_sort<language_type_rec, __int64, less<language_type_rec>>(v23, (v22 - (char*)v23) / 24, &pred);
-    if (uvector_base<24, 8, vector_base<allocator_t<24, 8>, unsigned short>>::empty(&v1->_language_types))
-        debug::fail((debug*)"!_language_types.empty()", "engine.cpp", "cengine::create", 1555);
-    p_text_languages = &v1->_text_languages;
+    R_ASSERT(!_language_types.empty());
     v61 = &v1->_text_languages;
     v25 = type_info::_name_internal_method((type_info*)&str_shared `RTTI Type Descriptor', &__type_info_root_node);
         v26 = &v1->_text_languages.threading_rw_check;
@@ -208,70 +203,8 @@ void cengine::create()
         do
         {
             v31 = (char*)p_language_types->_array + v29;
-            if (v30)
-            {
-                if (v30->_state.writers)
-                {
-                    while (_InterlockedCompareExchange(*(volatile signed __int32**)&threading::thread_check_lock._lock, -1, 0))
-                        ;
-                    __debugbreak();
-                    if (v30->_state.writers)
-                    {
-                        LODWORD(lua_sectiona) = 81;
-                        debug::fail(
-                            (debug*)"0 == _t->_state.writers",
-                            "read exit when writing is active",
-                            "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                            "threading_rw_check::read_lock::~read_lock",
-                            lua_sectiona,
-                            lua_section2a);
-                    }
-                    threading::thread_check_lock._lock = 0;
-                    v29 = v51;
-                }
-                _InterlockedDecrement(&v30->_state.readers);
-            }
             if (v31[16])
             {
-                if (p_language_types)
-                {
-                    v32 = &p_language_types->threading_rw_check;
-                    if (p_language_types != (u_vector<language_type_rec, allocator_t, unsigned short> *) - 16LL)
-                    {
-                        _InterlockedIncrement(&v32->_state.readers);
-                        if (p_language_types->_state.writers)
-                        {
-                            while (_InterlockedCompareExchange(
-                                *(volatile signed __int32**)&threading::thread_check_lock._lock,
-                                -1,
-                                0))
-                                ;
-                            __debugbreak();
-                            if (p_language_types->_state.writers)
-                            {
-                                LODWORD(lua_sectiona) = 72;
-                                debug::fail(
-                                    (debug*)"0 == _t->_state.writers",
-                                    "cannot read when writing is active",
-                                    "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                                    "threading_rw_check::read_lock::read_lock",
-                                    lua_sectiona,
-                                    lua_section2a);
-                            }
-                            threading::thread_check_lock._lock = 0;
-                        }
-                    }
-                }
-                else
-                {
-                    v32 = 0;
-                }
-                if (v54 >= p_language_types->_size)
-                    debug::fail(
-                        (debug*)"id < count()",
-                        "d:\\trunk\\src\\ucore\\u_vector_base.h",
-                        "uvector_base<24,8,struct vector_base<class allocator_t<24,8>,unsigned short> >::unsafe_at",
-                        76);
                 v33 = (const str_shared*)((char*)p_language_types->_array + v51);
                 if (v32)
                 {
@@ -310,9 +243,9 @@ void cengine::create()
             v54 = v28;
         } while (v28 != v59);
         v1 = v63;
-        p_text_languages = v61;
+        _text_languages = v61;
     }
-    array = (str_shared*)p_text_languages->_array;
+    array = (str_shared*)_text_languages->_array;
     v37 = str_shared::c_str(array);
     str_shared::str_shared(&l, v37, 0);
     if (v1->_lang_text.p_ != l.p_)
@@ -338,6 +271,7 @@ void cengine::create()
                 _mm_prefetch((const char*)&new_stable[-1]._lang.p_ + 4, 2);
                 v41 = memory();
                 u_memory::main_realloc(v41, new_stable, 0, 4u, "C++ delete", 0);
+                R_ASSERT(0 == engine._new_stable);
                 if (engine._new_stable)
                     debug::fail((debug*)"0 == engine._new_stable", "engine.cpp", "cengine::lang_text", 581);
             }
@@ -360,4 +294,87 @@ void cengine::create()
     }
     R_ASSERT(lang_text().size());
     flags_ready = true;
+}
+
+static void enum_benchmarks(u_vector<u_string>* vec)
+{
+    if (!g_bench_runs_cnt)
+    {
+        u_string dest = "benchmark";
+        vec->push_back(dest);
+    }
+}
+
+void cengine::prepare_oa_tests()
+{
+    R_ASSERT(bench_state == BENCH_DISABLED);
+    if (g_benchmark)
+    {
+        bench_state = BENCH_ENABLED;
+        engine.flags_bench_enabled = true;
+        rlog("OA enabled!");
+    }
+    else
+    {
+        if (strstr(core.params(), "-trace"))
+        {
+            u_vector<u_string> benchmarks;
+            enum_benchmarks(&benchmarks);
+            for (u_vector<u_string>::iterator i = benchmarks.begin(); i != benchmarks.end(); i++)
+            {
+                string1024 path;
+                sz_cpy(path, sizeof(path), "levels_tracks\\");
+
+                u_string curr_bench = *benchmarks[i];
+                sz_cat(path, sizeof(path), curr_bench.c_str());
+                sz_cat(path, sizeof(path), "_benchmark");
+                vfs::trace.camera_track(path);
+            }
+        }
+    }
+}
+
+void cengine::core_level_downloaded_thread()
+{
+    if (!core_level_downloaded_thread_exit)
+    {
+        while (true)
+        {
+            if (core.level_downloaded(core_level_downloaded_name.c_str()))
+                break;
+
+            threading::yield(100);
+            if (core_level_downloaded_thread_exit)
+                return;
+        }
+        core_level_downloaded = true;
+    }
+}
+
+bool cengine::is_lang_supported(str_shared l)
+{
+    for (u32 i = 0; i < _language_types.size(); i++)
+    {
+        str_shared lang = *_language_types[i];
+        if (lang == l)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool cengine::is_very_first_start()
+{
+    if (g_editor)
+        return true;
+
+    if ((e_load_dynamic & 4) != 0)
+        return (e_load_dynamic >> 1) & 1;
+
+    str_shared filename; // [rsp+38h] [rbp+10h] BYREF
+    g_game.user_app_data(&filename, console()->config_file, 0);
+    string_path v6; // rdx
+    e_load_dynamic = *((*)this + 81) & 0xFD | (unsigned __int8)(2 * ((vfs::exists_os(filename.c_str(), &v6) == 0) | 2));
+    return (e_load_dynamic >> 1) & 1;
 }

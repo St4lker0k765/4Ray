@@ -11,5 +11,7 @@
 #endif
 
 #include "defines.h"
+#include "iedit_cover.h"
+#include "iedit_entity.h"
 #include "editor_interface.h"
 #include "engine.h"

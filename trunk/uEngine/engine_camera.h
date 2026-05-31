@@ -101,9 +101,6 @@ public:
 	void reset_gasmask();
 	void set_gasmask(float value);
 
-	void yfov(float value)
-	{
-
-	}
+	void yfov(float value) { _yfov = value; }
 	float yfov() { return _yfov; }
 };

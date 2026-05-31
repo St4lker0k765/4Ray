@@ -111,7 +111,7 @@ void u_core::_initialize(LPCSTR _application_name, LPCSTR _data_path, bool no_lo
         log_create(no_log);
         platform.initialize_end();
         bugtrap_attach_process();
-        _complete_edition = 0;
+        _complete_edition = false;
 
         if (strstr(params(), "-build_key "))
         {
@@ -158,7 +158,7 @@ void u_core::set_build_key_2034()
     _build_key = BUILD_ID_2034;
 }
 
-u64 u_core::complete_edition()
+bool u_core::complete_edition()
 {
     R_ASSERT(_build_key.size());
     return _complete_edition;

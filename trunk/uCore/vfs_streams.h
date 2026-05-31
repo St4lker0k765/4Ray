@@ -76,6 +76,180 @@ namespace vfs
 		bool chunk_try_open_at_current_position(u32 ID, ireader* result);
 	};
 
+	class istorage
+	{
+	protected:
+		u8** __data = 0;
+		u8* _data = 0;
+		u8* __pointer = 0;
+		int __mem_size = 0;
+		int __file_size = 0;
+	public:
+		u64 calc_mem_size(u32 cur_mem_size, u32 req_mem_size, const u32 mul, const u32 div)
+		{
+			u32 sz = cur_mem_size;
+			if (cur_mem_size < 0x80)
+				sz = 128;
+			for (; sz <= req_mem_size; sz = mul * sz / div)
+				;
+			return (sz + 127) & 0xFFFFFF80;
+		}
+		void clear()
+		{
+			if (__mem_size < 0)
+				reserve_cold(0, 0, 0);
+			__file_size = 0;
+			R_ASSERT(__data);
+			__pointer = *__data;
+		}
+		u8* data()
+		{
+			R_ASSERT(__data);
+			return *__data;
+		}
+		void freemem()
+		{
+			R_ASSERT(__data);
+			__mem_size = 0;
+			__pointer = nullptr;
+			// port memory macroses from xr?
+			memory()->xmem_realloc((char*)__data, 0, 0, "storage_data_t::freemem");
+		}
+		void init(u8** data, int size)
+		{
+			__data = data;
+			__mem_size = size;
+			__pointer = *data;
+			__file_size = size;
+		}
+		u8* pointer()
+		{
+			if (data())
+				return __pointer;
+			return 0;
+		}
+		void reserve(int reserve_mem_size, int exact, int allow_out_of_memory)
+		{
+			if (reserve_mem_size > __mem_size)
+				reserve_cold(reserve_mem_size, exact, allow_out_of_memory);
+		}
+		void reserve_cold(int reserve_mem_size,	const int exact, const int allow_out_of_memory)
+		{
+			unsigned int mem_size; // r14d
+
+			R_ASSERT(__data);
+			char* v13;
+			if (exact)
+			{
+				mem_size = reserve_mem_size + 16;
+				v13 = memory()->xmem_realloc(nullptr, (u32)(reserve_mem_size + 16), 0x80u, "storage");
+			}
+			u32 v10 = reserve_mem_size + 16;
+			if (__mem_size < 0x80)
+				__mem_size = 128;
+			for (; __mem_size <= v10; __mem_size = (3 * __mem_size) >> 1)
+				;
+			mem_size = (__mem_size + 127) & 0xFFFFFF80;
+			v13 = memory()->xmem_realloc(nullptr, mem_size, 0x80u, "storage");
+			if (!v13)
+			{
+				if (__mem_size < 0x80)
+					__mem_size = 128;
+				for (; __mem_size <= v10; __mem_size = 11 * __mem_size / 0xA)
+					;
+				mem_size = (__mem_size + 127) & 0xFFFFFF80;
+				v13 = memory()->xmem_realloc(nullptr, mem_size, 0x80u, "storage");
+				if (!v13)
+				{
+				LABEL_14:
+					mem_size = reserve_mem_size + 16;
+					v13 = memory()->xmem_realloc(nullptr, (u32)(reserve_mem_size + 16), 0x80u, "storage");
+				}
+			}
+			R_ASSERT(mem_size >= 16);
+			if (v13)
+			{
+				if (__data)
+				{
+					size_t v18 = __mem_size + 16;
+					memcpy(v13, __data, v18);
+					memory()->xmem_realloc((char*)__data, 0, 0, "storage_data_t::reserve_cold");
+				}
+				*__data = (u8*)v13;
+			}
+			else
+			{
+				if (allow_out_of_memory)
+					return;
+
+				debug::fatal("! out of memory");
+			}
+			__pointer = &data()[tell()];
+			__mem_size = mem_size - 16;
+		}
+		void resize(int count)
+		{
+			if (count > __mem_size)
+				reserve_cold(count, 0, 0);
+			__file_size = count;
+			__pointer = data();
+		}
+		void seek(u32 pos)
+		{
+			__pointer = &data()[pos];
+		}
+		size_t size()
+		{
+			int v2 = tell();
+			if ((__file_size ^ (__file_size >> 31)) + (v2 ^ (v2 >> 31)) - (__file_size >> 31) - (v2 >> 31) == 0x7FFFFFFF)
+				debug::fail("_abs(x)+_abs(y) < s32(u32(u32(1)<<31) - u32(1))", "d:\\trunk\\src\\ucore\\libstdext.h", "_max", 299);
+			return v2 - ((v2 - __file_size) & (u32)((v2 - __file_size) >> 31));
+		}
+
+		virtual bool valid()
+		{
+			return __data && *__data;
+		}
+		virtual void seek(u32 pos)
+		{
+			__pointer = &data()[pos];
+		}
+		virtual u32 tell()
+		{
+			return (__pointer - data());
+		}
+		virtual void w(const char* ptr, u32 count)
+		{
+			if (count)
+			{
+				if (count > 16 && count + tell() > __mem_size)
+				{
+					_mm_prefetch(ptr, 2);
+					if (tell() + count > __mem_size)
+						reserve_cold(tell() + count, 0, 0);
+				}
+				u8* v8 = __pointer;
+				s64 v9 = ptr - (const char*)__pointer;
+				do
+				{
+					char v10 = (v8++)[v9];
+					*(v8 - 1) = v10;
+				} while (v8 != &__pointer[count]);
+				__pointer = &__pointer[count];
+				if (count <= 16)
+				{
+					if ((tell() + count) > __mem_size)
+						reserve_cold(tell() + count, 0, 0);
+				}
+			}
+		}
+		virtual void space(u32 size)
+		{
+			if (size + 16 > __mem_size)
+				reserve_cold(size + 16, 1, 0);
+		}
+	};
+
 	class UCORE_API iwriter
 	{
 	protected:
@@ -201,6 +375,57 @@ namespace vfs
 			w_s32(v.y);
 			w_s32(v.z);
 			w_s32(v.w);
+		}
+	};
+	class file_writer : public iwriter
+	{
+	protected:
+		int hf;
+		//path_notifier::excluder _excluder;
+	public:
+		file_writer(const char* name)
+		{
+			//vfs::path_notifier::excluder::excluder(&_excluder, name);
+			hf = 0;
+			if (name && *name)
+			{
+				f_name = name;
+				vfs::path_build_os(f_name.c_str());
+				hf = open(f_name.c_str(), 33537, 384);
+			}
+		}
+		virtual ~file_writer()
+		{
+			if (hf > 0)
+				_close(hf);
+
+			//if (vfs::path_notifier::_instance)
+			//	vfs::path_notifier::exclude_end(vfs::path_notifier::_instance, &this->_excluder._file);
+		}
+		virtual void seek(u32 pos)
+		{
+			R_ASSERT(valid());
+			lseek(hf, pos, 0);
+		}
+		virtual u32 tell()
+		{
+			R_ASSERT(valid());
+			return ::tell(hf);
+		}
+		virtual bool valid()
+		{
+			return hf > 0;
+		}
+		virtual void w(const void* _ptr, u32 count)
+		{
+			R_ASSERT(hf > 0);
+			if (count)
+			{
+				R_ASSERT(_ptr);
+
+				int res = write(hf, _ptr, count);
+				R_ASSERT2(res==int(count), "Can't write mem block to file. Disk maybe full.");
+			}
 		}
 	};
 }

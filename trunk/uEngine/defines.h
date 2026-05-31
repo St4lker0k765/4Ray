@@ -1,6 +1,6 @@
 #pragma once
 
-enum e_edit_mode : int
+enum e_edit_mode
 {
     em_game = 0,
     em_level_editor,
@@ -8,12 +8,25 @@ enum e_edit_mode : int
     em_other
 };
 
-enum e_shapes_draw_mode : int
+enum e_shapes_draw_mode
 {
     sm_wire = 0,
     sm_wire_top,
     sm_solid
-}
+};
+
+enum 
+{
+    BENCH_DISABLED = 0,
+    BENCH_ENABLED,
+    BENCH_CONNECTED,
+    BENCH_TEST_STARTED,
+    BENCH_MAP_STARTED,
+    BENCH_TRACK_STARTED,
+    BENCH_TRACK_FINISHED,
+    BENCH_FINISHED,
+    BENCH_CLOSE_APP
+} bench_state;
 
 ENGINE_API bool g_editor = false;
 ENGINE_API bool g_nopressanykey = false;
@@ -22,3 +35,7 @@ ENGINE_API bool g_summary = false;
 ENGINE_API bool g_disable_mboxes = false;
 ENGINE_API bool g_resave = false;
 ENGINE_API bool g_trace = false;
+
+// for benchmark
+ENGINE_API u8 g_bench_runs_cnt = 0;
+ENGINE_API bool g_benchmark = false;

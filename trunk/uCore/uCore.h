@@ -51,7 +51,7 @@ protected:
 	u_string comp_name;
 	wstring64 ui_game_nick;
 	str_shared _build_key;
-	int _complete_edition;
+	bool _complete_edition;
 	string4096 params_string;
 	bool params_valid;
 	bool trace;
@@ -78,9 +78,9 @@ public:
 	bool build_33_34();
 	const str_shared build_key();
 
-	u64 complete_edition();
-	u64 dlc_downloaded() { return 1; }
-	u64 level_downloaded() { return 1; }
+	bool complete_edition();
+	bool dlc_downloaded() { return true; }
+	bool level_downloaded(const char* name) { return true; }
 
 	str_shared menu_level(str_shared* result);
 	char* params();

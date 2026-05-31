@@ -5,7 +5,9 @@
 
 class iconstructable
 {
+	virtual iconstructable* _construct() {}
 	virtual void _destruct() {}
+	virtual void dtr_iconstructable() {}
 };
 
 // Class creation/destroying interface
@@ -148,7 +150,7 @@ public:
 
 	void append_error_message(const char* msg);
 	void check_language_change();
-	void core_downloaded_thread(void* __formal);
+	void core_level_downloaded_thread();
 
 	void create();
 	void destroy();
