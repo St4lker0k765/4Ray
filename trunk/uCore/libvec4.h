@@ -57,10 +57,12 @@ public:
 typedef _vec4<float>		Fvector;
 typedef _vec4<double>	Dvector;
 typedef _vec4<s32>		Ivector;
+typedef _vec4<s16>		Svector;
 
 typedef							_vec4<float>		Fvector4;
 typedef							_vec4<double>	Dvector4;
 typedef							_vec4<s32>		Ivector4;
+typedef							_vec4<s16>		Svector4;
 
 template <class T>
 BOOL	_valid			(const _vec4<T>& v)	{ return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z) && _valid((T)v.w);	}

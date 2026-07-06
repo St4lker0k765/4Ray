@@ -131,6 +131,7 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="engine_camera.cpp" />
     <ClCompile Include="engine_timing.cpp" />
+    <ClCompile Include="IGame.cpp" />
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stable.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="engine_camera.h" />
     <ClInclude Include="engine_timing.h" />
+    <ClInclude Include="IGame.h" />
     <ClInclude Include="locale.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stable.h" />

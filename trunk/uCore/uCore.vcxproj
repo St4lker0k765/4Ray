@@ -195,6 +195,7 @@
     <ClInclude Include="gtl\intrusive_ptr_inline.h" />
     <ClInclude Include="gtl\object_type_traits.h" />
     <ClInclude Include="libbitwise.h" />
+    <ClInclude Include="libflags.h" />
     <ClInclude Include="libmath.h" />
     <ClInclude Include="libmatrix.h" />
     <ClInclude Include="libmatrix43.h" />

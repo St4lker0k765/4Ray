@@ -302,5 +302,8 @@
     <ClInclude Include="libmatrix43.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="libflags.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

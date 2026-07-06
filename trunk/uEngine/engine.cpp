@@ -180,15 +180,16 @@ void cengine::create()
     v23 = (language_type_rec*)uvector_base<24, 8, vector_base<allocator_t<24, 8>, unsigned short>>::begin(&v1->_language_types);
     _shell_sort<language_type_rec, __int64, less<language_type_rec>>(v23, (v22 - (char*)v23) / 24, &pred);
     R_ASSERT(!_language_types.empty());
-    v61 = &v1->_text_languages;
+    v61 = &_text_languages;
     v25 = type_info::_name_internal_method((type_info*)&str_shared `RTTI Type Descriptor', &__type_info_root_node);
         v26 = &v1->_text_languages.threading_rw_check;
     v27 = v25;
     if (v1 == (cengine*)-128LL)
         v26 = 0;
+
     threading_rw_check::write_lock::write_lock(&v64, v26);
     uvector_base<8, 8, vector_base<allocator_t<8, 8>, unsigned short>>::inner_release<str_shared>(
-        &v1->_text_languages,
+        &_text_languages,
         0,
         0,
         v27);
@@ -206,28 +207,6 @@ void cengine::create()
             if (v31[16])
             {
                 v33 = (const str_shared*)((char*)p_language_types->_array + v51);
-                if (v32)
-                {
-                    if (v32->_state.writers)
-                    {
-                        while (_InterlockedCompareExchange(*(volatile signed __int32**)&threading::thread_check_lock._lock, -1, 0))
-                            ;
-                        __debugbreak();
-                        if (v32->_state.writers)
-                        {
-                            LODWORD(lua_sectiona) = 81;
-                            debug::fail(
-                                (debug*)"0 == _t->_state.writers",
-                                "read exit when writing is active",
-                                "d:\\trunk\\src\\ucore\\threading_rw_check.h",
-                                "threading_rw_check::read_lock::~read_lock",
-                                lua_sectiona,
-                                lua_section2a);
-                        }
-                        threading::thread_check_lock._lock = 0;
-                    }
-                    _InterlockedDecrement(&v32->_state.readers);
-                }
                 v34 = type_info::_name_internal_method((type_info*)&str_shared `RTTI Type Descriptor', &__type_info_root_node);
                     uvector_base<8, 8, vector_base<allocator_t<8, 8>, unsigned short>>::push_back<str_shared, _nonrelocable_ptr__tag>(
                         v61,
@@ -272,8 +251,6 @@ void cengine::create()
                 v41 = memory();
                 u_memory::main_realloc(v41, new_stable, 0, 4u, "C++ delete", 0);
                 R_ASSERT(0 == engine._new_stable);
-                if (engine._new_stable)
-                    debug::fail((debug*)"0 == engine._new_stable", "engine.cpp", "cengine::lang_text", 581);
             }
             v42 = type_info::_name_internal_method(
                 (type_info*)&load_new_stable_wi `RTTI Type Descriptor',
@@ -285,7 +262,7 @@ void cengine::create()
                 load_new_stable_wi::load_new_stable_wi(v44, &engine._new_stable);
                 v5 = v45;
             }
-            streaming::server::add(g_streamer, v5);
+            g_streamer.add(v5);
         }
         else
         {

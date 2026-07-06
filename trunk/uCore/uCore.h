@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include "fastdelegate.h"
 #include "libtypes.h"
+#include "libflags.h"
 #include "threading.h"
 #include "gtl/intrusive_ptr.h"
 #include "libtimer.h"
@@ -19,6 +20,7 @@
 #endif
 
 #include "debug.h"
+#include "archive.h"
 #include "libstr.h"
 #include "libmath.h"
 #include "librandom.h"

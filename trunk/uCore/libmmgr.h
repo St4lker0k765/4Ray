@@ -126,38 +126,38 @@ extern UCORE_API u_memory* memory();
 #ifdef DEBUG_MEMORY_NAME
 // new(0)
 template <class T>
-IC	T* xr_new()
+IC	T* u_new()
 {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T();
 }
 // new(1)
 template <class T, class P1>
-IC	T* xr_new(const P1& p1) {
+IC	T* u_new(const P1& p1) {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T(p1);
 }
 // new(2)
 template <class T, class P1, class P2>
-IC	T* xr_new(const P1& p1, const P2& p2) {
+IC	T* u_new(const P1& p1, const P2& p2) {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T(p1, p2);
 }
 // new(3)
 template <class T, class P1, class P2, class P3>
-IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3) {
+IC	T* u_new(const P1& p1, const P2& p2, const P3& p3) {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T(p1, p2, p3);
 }
 // new(4)
 template <class T, class P1, class P2, class P3, class P4>
-IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4) {
+IC	T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4) {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T(p1, p2, p3, p4);
 }
 // new(5)
 template <class T, class P1, class P2, class P3, class P4, class P5>
-IC	T* xr_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5) {
+IC	T* u_new(const P1& p1, const P2& p2, const P3& p3, const P4& p4, const P5& p5) {
 	T* ptr = (T*)Memory.mem_alloc(sizeof(T), typeid(T).name());
 	return new (ptr) T(p1, p2, p3, p4, p5);
 }
