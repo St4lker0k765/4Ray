@@ -1,75 +1,136 @@
-#pragma
+#pragma once
 
-u32 archive_def::save_chunk_no(u32 save_chunk_mask)
+class archive_def
 {
-    u32 mask = save_chunk_mask;
-    if (!mask)
-        return 0;
+public:
+	enum array_item_type
+	{
+		ait_custom = 0,
+		ait_file,
+		ait_groups,
+		ait_entity,
+		ait_cover,
+		ait_vs,
+		ait_sound,
+		ait_sound_effect_reverb,
+		ait_sound_effect_echo,
+		ait_music_scheme,
+		ait_music_theme,
+		ait_texture,
+		ait_shader,
+		ait_color_anim,
+		ait_particles_system,
+		ait_particles_effect,
+		ait_particles_modifier,
+		ait_camera_track,
+		ait_model,
+		ait_skeleton,
+		ait_bone,
+		ait_anim,
+		ait_bone_part,
+		ait_attp,
+		ait_tpreset,
+		ait_material_game,
+		ait_material_melee,
+		ait_material_step,
+		ait_material_pair,
+		ait_fx_group,
+		ait_fx_anim,
+		ait_sound_scheme,
+		ait_sound_scheme_item,
+		ait_environment,
+		ait_use_icon,
+		ait_flares,
+		ait_string,
+		ait_loc_string,
+		ait_cc,
+		ait_mp_classes,
+		ait_ammo_types,
+		ait_font,
+		ait_total,
+		ait_invalid = u32(-1),
+	};
 
-    u32 res = 0;
-    if (!mask)
+    inline u32 save_chunk_no(u32 save_chunk_mask)
     {
-        res = 16;
-        mask >>= 16;
+        u32 mask = save_chunk_mask;
+        if (!mask)
+            return 0;
+
+        u32 res = 0;
+        if (!(s16)mask)
+        {
+            res = 16;
+            mask >>= 16;
+        }
+        if (!(s8)mask)
+        {
+            res += 8;
+            mask >>= 8;
+        }
+        if ((mask & 0xF) == 0)
+        {
+            res += 4;
+            mask >>= 4;
+        }
+        if ((mask & 3) == 0)
+        {
+            res += 2;
+            mask >>= 2;
+        }
+        if ((mask & 1) == 0)
+            ++res;
+
+        // wtf is ARCHIVE_CHUNKS?
+        //R_ASSERT(res <= ARCHIVE_CHUNKS);
+        return res;
     }
-    if (!mask)
+
+    inline u32 save_chunk_no_from_flag(u64 fl)
     {
-        res += 8;
-        mask >>= 8;
+        return save_chunk_no(fl >> 32 & 0xFFFFFFFF);
     }
-    if ((mask & 0xF) == 0)
+
+    ArchiveArrImplPtr w_array_t(
+        archive* self,
+        u64 fl,
+        const char* key,
+        const char* caption,
+        u32 size,
+        const char* value_key_format,
+        const char* value_caption_format,
+        const fastdelegate::FastDelegate2<u32, u32, void>* _1,
+        const fastdelegate::FastDelegate2<u32, u32, void>* _2)
     {
-        res += 4;
-        mask >>= 4;
+        ArchiveArrImplPtr result;
+        ARCHIVE_PTR array_arch = self->w_section_s(fl, key, caption);
+        result = w_array_t(fl, array_arch, size, value_key_format, value_caption_format, _1, _2);
+        return result;
     }
-    if ((mask & 3) == 0)
+    inline ArchiveArrImplPtr w_array_t(
+        u64 fl,
+        const ARCHIVE_PTR array_arch,
+        u32 size,
+        const char* value_key_format,
+        const char* value_caption_format,
+        const fastdelegate::FastDelegate2<u32, u32, void>* _1,
+        const fastdelegate::FastDelegate2<u32, u32, void>* _2)
     {
-        res += 2;
-        mask >>= 2;
+        R_ASSERT(array_arch);
+        ArchiveArrImpl* array = u_new<archive_array_impl<archive>>();
+        array->construct(array_arch, fl);
+
+        if (!array_arch->writing())
+        {
+            size = array_arch->r_u32(fl, "count");
+        }
+        else
+        {
+            array_arch->w_u32(fl, "count", nullptr, size, 0, u32(-1), 0);
+        }
+        array->_count = size;
+        array->_key_format = value_key_format;
+        array->_caption_format = value_caption_format;
+        return array;
     }
-    if ((mask & 1) == 0)
-        ++res;
-
-    // wtf is ARCHIVE_CHUNKS?
-    //R_ASSERT(res <= ARCHIVE_CHUNKS);
-    return res;
-}
-
-u32 archive_def::save_chunk_no_from_flag(u64 fl)
-{
-    return save_chunk_no(fl >> 32 & 0xFFFFFFFF);
-}
-
-ARCHIVE_PTR archive_def::w_array_t(
-    ARCHIVE_PTR result,
-    u64 fl,
-    const ARCHIVE_PTR array_arch,
-    unsigned int size,
-    const char* value_key_format,
-    const char* value_caption_format)
-{
-    archive_array_impl<archive>* v10; // rbx
-    int v11; // eax
-    archive* object; // rcx
-    bool v13; // zf
-    archive_vtbl* v14; // rax
-
-    R_ASSERT(array_arch);
-    v10 = u_new<archive_array_impl<archive>>();
-    archive_array_base<archive>::construct(v10, array_arch, fl);
-    v11 = array_arch->_object->writing(array_arch->_object);
-    object = array_arch->_object;
-    v13 = v11 == 0;
-    v14 = array_arch->_object->__vftable;
-    if (v13)
-        size = v14->r_u32(object, fl, "count");
-    else
-        v14->w_u32_2(object, fl, "count", nullptr, size, 0, -1u, 0);
-    v10->_count = size;
-    if (++v10->_ref_count <= 0)
-        v10 = nullptr;
-    result->_object = v10;
-    v10->_key_format = value_key_format;
-    v10->_caption_format = value_caption_format;
-    return result;
-}
+};
