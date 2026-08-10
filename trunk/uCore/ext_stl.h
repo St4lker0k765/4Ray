@@ -132,6 +132,7 @@ protected:
 	_C c;
 };
 
+#include <map>
 template	<typename T, typename allocator = u_alloc<T> >									class	u_list 			: public std::list<T,allocator>			{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class P=std::less<K>, typename allocator = u_alloc<K> >				class	u_set			: public std::set<K,P,allocator>		{ public: u32 size() const {return (u32)__super::size(); } };
 template	<typename K, class P=std::less<K>, typename allocator = u_alloc<K> >				class	u_multiset		: public std::multiset<K,P,allocator>	{ public: u32 size() const {return (u32)__super::size(); } };

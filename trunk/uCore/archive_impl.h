@@ -76,7 +76,7 @@ public:
 	}
 	static archive_array_impl<T>* create(ClassPtr array_archive, u64 attr_flag, u32 size, bool store_count)
 	{
-		archive_array_impl<T>* array = u_new<archive_array_impl<T>>();
+		archive_array_impl<T>* array = new archive_array_impl<T>();
 		array->construct(array_archive, attr_flag, size, store_count);
 		return array;
 	}

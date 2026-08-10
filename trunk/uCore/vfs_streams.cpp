@@ -217,7 +217,7 @@ void vfs::reader_base::r_stringz(char* dest, u32 tgt_sz)
 
 void vfs::reader_base::r_stringz(str_shared& dest, str_type type)
 {
-    dest = (char*)(__data + __pos);
+    dest._set((char*)(__data + __pos), type);
     __pos += (dest.size() + 1);
 }
 
@@ -389,8 +389,6 @@ vfs::ireader* vfs::ireader::chunk_open_iterator(vfs::ireader* result, u32* ID, v
 
 bool vfs::ireader::chunk_open_try_current(u32 ID, vfs::ireader* result)
 {
-    int v16; // eax
-
     u32 type = r_u32();
     u32 sz;
     if (type == ID)

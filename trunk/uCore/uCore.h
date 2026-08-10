@@ -21,6 +21,7 @@
 
 #include "debug.h"
 #include "archive.h"
+#include "archive_stable.h"
 #include "libstr.h"
 #include "libmath.h"
 #include "librandom.h"
