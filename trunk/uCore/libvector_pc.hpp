@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <immintrin.h>
 #include "../uCore/debug.h"
+#include "libvec3.h"
+#include "libvec4.h"
 #define MM_FPSIGN_PS_3_ _mm_castsi128_ps(_mm_setr_epi32( \
     0x80000000, 0x80000000, 0x80000000, 0x00000000))
 #define MM_fff0 _mm_castsi128_ps(_mm_setr_epi32(-1, -1, -1, 0))
@@ -27,23 +29,8 @@ namespace urandom {
 * Replace this single file into many files
 * Re-check and re-write (if needed) all hard mathematical & SSE-using functions
 */
-
-template <typename T>
-struct _vec3 {
-	T x;
-	T y;
-	T z;
-};
-template <typename T>
-struct _vec4 {
-	T x;
-	T y;
-	T z;
-	T w;
-};
-
-template <typename T>
-bool _valid(const _vec3<T>* v);
+float deg2rad(float val);
+float rad2deg(float val);
 
 class implement {
 	float deg2rad(float val);

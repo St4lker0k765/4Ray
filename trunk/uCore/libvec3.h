@@ -431,11 +431,14 @@ typedef _vec3<s32>		Ivector3;
 template <class T>
 bool	_valid			(const _vec3<T>& v)	{ return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z);	}
 
+template <class T>
+bool	_valid(const _vec3<T>* v) { return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z); }
+
 //////////////////////////////////////////////////////////////////////////
 #pragma warning(push)
 #pragma warning(disable:4244)
 __forceinline		double	rsqrt			(double v)		{	return 1.0/sqrt(v);			}
-__forceinline		BOOL	exact_normalize (float* a)
+__forceinline		bool	exact_normalize (float* a)
 {
 	double	sqr_magnitude	= a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
 	double	epsilon			= 1.192092896e-05F;
@@ -445,7 +448,7 @@ __forceinline		BOOL	exact_normalize (float* a)
 		a[0]		*=	l;
 		a[1]		*=	l;
 		a[2]		*=	l;
-		return		TRUE;
+		return		true;
 	}
 	double a0,a1,a2,aa0,aa1,aa2,l;
 	a0 = a[0];
@@ -483,7 +486,7 @@ aa2_largest:	// aa2 is largest
 				a[0] = 0;	// if all a's are zero, this is where we'll end up.
 				a[1] = 1;	// return a default unit length vector.
 				a[2] = 0;
-				return	FALSE;
+				return	false;
 			}
 			a1 /= aa0;
 			a2 /= aa0;
@@ -493,7 +496,7 @@ aa2_largest:	// aa2 is largest
 			a[2] = a2*l;
 		}
 	}
-	return	TRUE;
+	return	true;
 }
-__forceinline BOOL	exact_normalize	(Fvector3& a)	{	return exact_normalize(&a.x);	}
+__forceinline bool	exact_normalize	(Fvector3& a)	{	return exact_normalize(&a.x);	}
 #pragma warning(pop)
