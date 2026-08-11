@@ -7,27 +7,11 @@
 * Re-check and re-write (if needed) all hard mathematical & SSE-using functions
 */
 
-template <typename T>
-bool _valid(const _vec3<T>* v)
-{
-	T x; // edx
-	T y; // ecx
-	T z; // ecx
-	bool result; // al
-
-	x = v->x;
-	result = false;
-	if ((LODWORD(v->x) & 0x7F800000) != 0x7F800000 && (((LODWORD(x) + 0x800000) & 0x7FBFFFFF) != 0 || x == NAN))
-	{
-		y = v->y;
-		if ((LODWORD(y) & 0x7F800000) != 0x7F800000 && (((LODWORD(y) + 0x800000) & 0x7FBFFFFF) != 0 || y == NAN))
-		{
-			z = v->z;
-			if ((LODWORD(z) & 0x7F800000) != 0x7F800000 && (((LODWORD(z) + 0x800000) & 0x7FBFFFFF) != 0 || z == NAN))
-				return true;
-		}
-	}
-	return result;
+float deg2rad(float val) {
+	return val * std::numbers::pi_v<float> / static_cast<float>(180.0);
+}
+float rad2deg(float val) {
+	return val * (180.0 / std::numbers::pi);
 }
 
 class implement {
@@ -674,7 +658,7 @@ class _vector {     //////////// recheck all this!!!
 				rnd.m.m128_i32[0]);
 		v7 = 214013 * R->holdrand + 2531011;
 		R->holdrand = v7;
-		v8 = _vector::random_dir(&rnd, R);
+		v8 = _vector::random_dir(R); // fix, orig v8 = _vector::random_dir(&rnd, R)
 		v9 = tanf(cone_angle);
 		v11 = (__m128)(3.0f);
 		v12 = _mm_set_ss(static_cast<float>((v7 >> 16) & 0x7FFF));
