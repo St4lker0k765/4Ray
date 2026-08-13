@@ -30,7 +30,6 @@ protected:
 	Factory_Create* p_create;
 	Factory_Destroy* p_destroy;
 
-	editor_interface* p_editor;
 	enum espawn_save : u8
 	{                                     
 		espawn_save_none,
@@ -85,15 +84,6 @@ protected:
 	volatile bool language_changed;
 	str_shared core_level_downloaded_name;
 	
-	volatile enum mapstate : u32
-	{
-		mapstate_loading = 1 << 0,
-		mapstate_loaded_and_waiting = 1 << 1,
-		mapstate_quickload = 1 << 2,
-		mapstate_running = 1 << 3,
-		mapstate_initializing = 1 << 4
-	};
-	volatile mapstate flags_mapstate;
 	u32 mapstate_delay_start;
 
 	bool showing_error;
@@ -145,6 +135,17 @@ protected:
 	u_vector<u_string> _error_messages;
 	threading::spin_lock _error_messages_lock;
 public:
+	volatile enum mapstate : u32
+	{
+		mapstate_loading = 1 << 0,
+		mapstate_loaded_and_waiting = 1 << 1,
+		mapstate_quickload = 1 << 2,
+		mapstate_running = 1 << 3,
+		mapstate_initializing = 1 << 4
+	};
+	volatile mapstate flags_mapstate;
+	editor_interface* p_editor;
+
 	cengine();
 	~cengine();
 

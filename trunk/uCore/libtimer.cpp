@@ -8,9 +8,9 @@ void timing::timer::start()
 	_start = _dest;
 }
 
-u64 timing::timer::get_elapsed_ms()
+u32 timing::timer::get_elapsed_ms()
 {
-	u64		_dest;
+	u32		_dest;
 	QueryPerformanceCounter((PLARGE_INTEGER)&_dest);
 	return 1000 * (_dest - _start) / platform.qpc.per_second;
 }

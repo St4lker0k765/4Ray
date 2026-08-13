@@ -31,3 +31,10 @@ inline bool		_valid(const double x)
 	*/
 	return		true;
 }
+
+template <typename T>
+T fp_lerp(T low, T hi, T amount)
+{
+	R_ASSERT2(0.f <= amount && amount <= 1.f, "lerp's amount parameter should be in [0..1]");
+	return ((1.f - amount) * low) + (hi * amount);
+}

@@ -11,6 +11,6 @@ namespace timing
 			u64 get_elapsed_us();
 			u64 get_elapsed_ticks();
 			float get_elapsed_sec();
-			u64 get_elapsed_ms();
+			u32 get_elapsed_ms();
 	};
 }
