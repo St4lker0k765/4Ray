@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "engine_timing.h"
+#include "../uSound/usound.h"
 
 void engine_timing::apply_slowmo()
 {

@@ -6,6 +6,7 @@
 #include <malloc.h>
 #include <limits>
 #include <typeinfo>
+#include <memory>
 #include "fastdelegate.h"
 #include "libtypes.h"
 #include "libflags.h"
